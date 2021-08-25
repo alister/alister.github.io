@@ -1,0 +1,153 @@
+<!doctype html><html xmlns=http://www.w3.org/1999/xhtml xml:lang=en lang=en-us>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,minimum-scale=1,maximum-scale=1">
+<link href=/css/fonts.css rel=stylesheet type=text/css>
+<title>Why I like djbdns & tinydns</title>
+<link rel=stylesheet href=/css/hugo-octopress.css>
+<link rel=stylesheet href=/css/fork-awesome.min.css>
+<link href=https://alister.github.io/favicon.png rel=icon>
+<meta name=description content>
+<meta name=keywords content>
+<meta name=author content="Alister Bulman">
+<meta name=generator content="Hugo 0.87.0">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="Why I like djbdns & tinydns">
+<meta name=twitter:description content="I&rsquo;ve been using TinyDNS, and the associated systems, like DNScache and DaemonTools since 2003, when I was first tasked with setting up a local DNS resolver, and a DNS server for a web-development company I was working at 
+https://www.datasouth.co.uk/. We had dozens of domain names, and organising the changes - as well as paying per domain name, was getting to be, well, annoying, as well as potentially expensive.
+So, I was asked to setup our own name servers&mldr;.">
+<meta name=twitter:domain content="alister.github.io">
+<meta name=twitter:creator content="@alister_b">
+</head>
+<body>
+<header role=banner>
+<hgroup>
+<h1><a href=https://alister.github.io/>Professional Blog</a></h1>
+<h2>A few things I've been up to</h2>
+</hgroup></header>
+<nav role=navigation>
+<fieldset class=mobile-nav>
+<select onchange="location=this.value"><option value>Navigate…</option><option value=https://alister.github.io/blog/>» Blog archive</option><option value=https://alister.github.io/presentations/>» Presentations</option></select>
+</fieldset>
+<ul class=main-navigation>
+<li><a href=https://alister.github.io/blog/ title="Blog archive" rel="noopener noreferrer">Blog archive</a></li>
+<li><a href=https://alister.github.io/presentations/ title=Presentations rel="noopener noreferrer">Presentations</a></li>
+</ul>
+<ul class=subscription>
+<a href=https://alister.github.io/index.xml target=_blank type=application/rss+xml title=RSS rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+</ul>
+<form action=https://www.google.com/search method=get target=_blank rel="noopener noreferrer">
+<fieldset role=search>
+<input class=search type=text name=q results=0 placeholder=Search>
+<input type=hidden name=q value=site:https://alister.github.io/>
+</fieldset>
+</form>
+</nav>
+<div id=main>
+<div id=content>
+<div>
+<article class=hentry role=article>
+<header>
+<p class=meta>Jan 7, 2013
+- 3 minute read
+</p>
+<h1 class=entry-title>
+Why I like djbdns & tinydns
+</h1>
+</header>
+<div class=entry-content>
+<p>I&rsquo;ve been using TinyDNS, and the associated systems, like DNScache and DaemonTools since 2003, when I was first tasked with setting up a local DNS resolver, and a DNS server for a web-development company I was working at
+<a href=https://www.datasouth.co.uk/ target=_blank rel=noopener>https://www.datasouth.co.uk/</a>. We had dozens of domain names, and organising the changes - as well as paying per domain name, was getting to be, well, annoying, as well as potentially expensive.</p>
+<p>So, I was asked to setup our own name servers&mldr;.</p>
+<p>I looked at BIND, and even bought the O&rsquo;Reilly &lsquo;Cricket&rsquo; book, but the plan was to use an in-house database management system/CMS to hold the details of the various DNS records and then output the pieces to the DNS server. The thought of producing bind format text files did not appeal - the are pretty complex.</p>
+<p>Then, I came across another option - TinyDNS, and a few associated tools, written by djb - Daniel J. Bernstein, who is a mathematician, cryptologist, programmer, and research professor of computer science. It&rsquo;s very <em>opinionated</em> software, and so is the configuration, but easy enough to follow a howto and get working.</p>
+<p>One of the design choices that make it so easy to work with is that there is a simple-to-understand format for the configuration file, one line per record, for example each Cname, A or MX record is just one line, with the first character being the type (for example a &lsquo;@&rsquo; for an MX record), and the various parts of it is then split up between colons. The latter parts of the record, with information as time-to-live durations, and other defaults, can be safely left to the defaults.</p>
+<p>See:
+<a href=https://cr.yp.to/djbdns/tinydns-data.html target=_blank rel=noopener>https://cr.yp.to/djbdns/tinydns-data.html</a> for the exact structure of the data file (or, in fact, of each line that you will generally be using).</p>
+<p>Given the various records already in a database, converting them each into such a simple output format is not very difficult at all. In fact, I used an existing perl script as a large basis to do the conversion (porting the perl to PHP was itself trivial), and simply wrapping some database access code around it.</p>
+<p>Since the output was just a text file, which was then compiled down into a small database, it was also trivial to have all the name servers (including a tertiary, ns3, name server) call into the server by HTTP (from a cron-job). The web-page produced the data, and output the file as plain text. With the page protected by IP and a HTTP password, it&rsquo;s entirely secure, and very easy to setup.</p>
+<p>In my next djbdns/tinydns post, I&rsquo;ll show you how to setup your own, local top-level domain names - which I find very useful for development, among other things.</p>
+<p>Also take a look at the first post in this little series:
+<a href=/blog/2012/12/31/dns-and-my-refreshed-cv-site/>DNS and my refreshed CV site</a>, where I also how an example of a TinyDNS zone file, and how simple it can be made with LuaDNS.</p>
+</div>
+<footer>
+<p class=meta>
+<span class="byline author vcard">Posted by <span class=fn>Alister Bulman</span></span>
+<time>Jan 7, 2013</time>
+<span class=categories>
+Tags:
+<a class=category href=https://alister.github.io/tags/dns>dns</a>
+</span>
+</p>
+<p class=meta>
+<a class="basic-alignment left" href=https://alister.github.io/blog/2013/01/01/a-mysql-optimisation-story/ title="A MySQL optimisation Story">A MySQL optimisation Story</a>
+<a class="basic-alignment right" href=https://alister.github.io/blog/2013/02/17/not-having-your-developers-quit-on-you-as-a-service/ title="Not having your developers quit on you - as a service">Not having your developers quit on you - as a service</a>
+</p>
+</footer>
+</article>
+</div>
+<aside class="sidebar thirds">
+<section class="first odd">
+<h1>Sidebar</h1>
+<p>
+Re-created with Hugo, Auguest 2021.
+</p>
+</section>
+<ul class=sidebar-nav>
+<li class=sidebar-nav-item>
+<a target=_blank rel="noopener noreferrer" href=https://github.com/alister title=https://github.com/alister><i class="fa fa-github-square fa-3x"></i></a>
+<a target=_blank rel="noopener noreferrer" href=https://bitbucket.org/alisterb/ title=https://bitbucket.org/alisterb/><i class="fa fa-bitbucket-square fa-3x"></i></a>
+<a target=_blank rel="noopener noreferrer" href=https://twitter.com/alister_b/ title=https://twitter.com/alister_b/><i class="fa fa-twitter-square fa-3x"></i></a>
+<a target=_blank rel="noopener noreferrer" href=https://www.linkedin.com/in/alisterbulman title=https://www.linkedin.com/in/alisterbulman><i class="fa fa-linkedin-square fa-3x"></i></a>
+<a target=_blank rel="noopener noreferrer" href=https://stackoverflow.com/users/6216/alister-bulman title=https://stackoverflow.com/users/6216/alister-bulman><i class="fa fa-stack-overflow-square fa-3x"></i></a>
+<a href=https://alister.github.io/index.xml type=application/rss+xml title=RSS><i class="fa fa-rss-square fa-3x"></i></a>
+</li>
+<a href=https://stackexchange.com/users/4189><img src=https://stackexchange.com/users/flair/4189.png width=208 height=58 alt="profile for Alister Bulman on Stack Exchange, a network of free, community-driven Q&A sites" title="profile for Alister Bulman on Stack Exchange, a network of free, community-driven Q&A sites"></a>
+</ul>
+<section class=odd>
+</section>
+<section class=even>
+<h1>Recent Posts</h1>
+<ul id=recent_posts>
+</ul>
+</section>
+<div class=sidebar-section>
+<h3>Tags</h3>
+<ul style=list-style-type:none;padding:0;margin:0>
+<a href=/tags/dns>dns (2)</a>
+<a href=/tags/anti-pattern>anti-pattern (1)</a>
+<a href=/tags/capistrano>capistrano (1)</a>
+<a href=/tags/contract>contract (1)</a>
+<a href=/tags/docker>docker (1)</a>
+<a href=/tags/employment>employment (1)</a>
+<a href=/tags/faker-extensions>faker-extensions (1)</a>
+<a href=/tags/forward3d>forward3d (1)</a>
+<a href=/tags/freelance>freelance (1)</a>
+<a href=/tags/git>git (1)</a>
+<a href=/tags/github>github (1)</a>
+<a href=/tags/hwioauthbundle>hwioauthbundle (1)</a>
+<a href=/tags/linux>linux (1)</a>
+<a href=/tags/mysql>mysql (1)</a>
+<a href=/tags/omniauth>omniauth (1)</a>
+<a href=/tags/opensource>opensource (1)</a>
+<a href=/tags/packagist>packagist (1)</a>
+<a href=/tags/phpdox>phpdox (1)</a>
+<a href=/tags/phplondon>phplondon (1)</a>
+<a href=/tags/presentations>presentations (1)</a>
+<a href=/tags/rant>rant (1)</a>
+<a href=/tags/repost>repost (1)</a>
+<a href=/tags/scaling>scaling (1)</a>
+<a href=/tags/wordpress>wordpress (1)</a>
+</ul>
+</div>
+</aside>
+</div>
+</div>
+<footer role=contentinfo>
+<p>Copyright &copy; 2021 Alister Bulman -
+<span class=credit>Powered by <a target=_blank href=https://gohugo.io rel="noopener noreferrer">Hugo</a> and <a target=_blank href=https://github.com/parsiya/hugo-octopress/ rel="noopener noreferrer">Hugo-Octopress</a> theme.
+</p>
+</footer>
+<script>var _gaq=[['_setAccount','UA-37346894-1'],['_trackPageview']];(function(a,b){var c=a.createElement(b),d=a.getElementsByTagName(b)[0];c.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js',d.parentNode.insertBefore(c,d)})(document,'script')</script>
+</body>
+</html>

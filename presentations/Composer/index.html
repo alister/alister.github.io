@@ -1,0 +1,321 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Composer</title>
+<!-- metadata -->
+<meta name="generator" content="S5" />
+<meta name="version" content="S5 1.1" />
+<meta name="presdate" content="20130510" />
+<meta name="author" content="Alister Bulman" />
+<meta name="company" content="n/a" />
+<!-- configuration parameters -->
+<meta name="defaultView" content="slideshow" />
+<meta name="controlVis" content="hidden" />
+<!-- style sheet links -->
+<link rel="stylesheet" href="ui/default/slides.css" type="text/css" media="projection" id="slideProj" />
+<link rel="stylesheet" href="ui/default/outline.css" type="text/css" media="screen" id="outlineStyle" />
+<link rel="stylesheet" href="ui/default/print.css" type="text/css" media="print" id="slidePrint" />
+<link rel="stylesheet" href="ui/default/opera.css" type="text/css" media="projection" id="operaFix" />
+<!-- embedded styles -->
+<!-- S5 JS -->
+<script src="ui/default/slides.js" type="text/javascript"></script>
+<style type="text/css" media="all">
+.imgcon {width: 525px; margin: 0 auto; padding: 0; text-align: center;}
+#anim {width: 270px; height: 320px; position: relative; margin-top: 0.5em;}
+#anim img {position: absolute; top: 42px; left: 24px;}
+img#me01 {top: 0; left: 0;}
+img#me02 {left: 23px;}
+img#me04 {top: 44px;}
+img#me05 {top: 43px;left: 36px;}
+blockquote {text-align: left; color: black;}
+</style>
+</head>
+<body>
+
+<div class="layout">
+<div id="controls"><!-- DO NOT EDIT --></div>
+<div id="currentSlide"><!-- DO NOT EDIT --></div>
+<div id="header"></div>
+<div id="footer">
+<h1>Composer for package management</h1>
+<h2>The Book Depository &#8226; 10th May 2013</h2>
+</div>
+</div>
+
+<div class="presentation">
+
+<div class="slide">
+<h1>Composer for package management</h1>
+<p>The Book Depository &#8226; 10th May 2013.</p>
+
+<h3>Alister Bulman</h3>
+<p><ul>
+    <li><a href="http://abulman.co.uk/">http://abulman.co.uk</a></li>
+    <li><a href="http://phpscaling.com">http://phpscaling.com</a></li>
+    <li><a href="http://twitter.com/alister_b">@alister_b</a></li>
+</ul></p>
+
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>self::about()</h1>
+<h2>self::current()</h2>
+<p>Scaling PHP-based systems, with related technologies. </p>
+
+<p>Creatively lazy. I don't want to have to reinvent the wheel.
+I use someone else's wheel whenever I possibly can.</p>
+
+<h2>self::prev()</h2>
+<p>Programming PHP since 1999, PHP v3, (>12 years ago). Previously in
+everything from a ZX81, BBC/Electron, 6502 to 8086 Assembler, Pascal and C/C++
+before PHP</p>
+
+  <div class="handout">
+    <p>Programming since 198-cough</p>
+  </div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>PHP Dependancy hell</h1>
+<ul>
+  <li>Pear</li>
+  <li>phpclasses.org</li>
+  <li>lots of copy and pasted code</li>
+</ul>
+
+<p>Either many copies, scattered around, or just one single one per system.</p>
+<p>Hard to update, annoying to keep in sync.</p>
+<p>Impossible if you need different versions in different sites.</p>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Code Reuse in the PHP Ecosystem</h1>
+<ul class="incremental">
+  <li>PHP had a very poor level of reuse</li>
+      <li>None at all between the major frameworks such as Zend/Symfony/Cake/Drupal</li>
+      <li>Common Standards kicked off a huge mindset change</li>
+      <li>PSR-0, Autoloading</li>
+
+  <li><strong>Why ?</strong></li>
+      <li>Allows to break down code into small, easily reused libraries</li>
+      <li>Still have to copy the code into the project</li>
+      <li>and then setup the autoloading namespace</li>
+      <li>And then came Composer...</li>
+</ul>
+
+  <div class="handout"></div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Hang on to your hats</h1>
+
+  <p>Composer live demo</p>
+  <ul class="incremental">
+    <li>pull in a UUID library <small>("rhumsaa/uuid": "2.1.1")</small></li>
+    <li>setup the autoloader, automatically</li>
+    <li>other people can install the same version, every time</li>
+  </ul>
+
+  <div class="handout"></div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Here's the basics</h1>
+
+<h3>Composer.json file</h3>
+<p><pre><code>"require": {
+        "zendframework/zendframework1": "1.12.3",
+        "rhumsaa/uuid": "2.1.*",
+        "thebookdepository/php-search": "dev-master"
+    },
+</code></pre></p>
+
+<p>Breaking down the parts:
+<ul class="incremental">
+  <li>vendor prefix zendframework / rhumsaa &amp; thebookdepository</li>
+  <li>Project name - zf1, uuid &amp; php-search</li>
+  <li>Versions, wildcards or the bleeding edge</li>
+</ul></p>
+
+<p>There are over 10,000 libraries available on http://packagist.org</p>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>composer.lock file</h1>
+
+<ul class="incremental">
+  <li>List of packages, versions and also licences</li>
+  <li>if available, <code>composer install</code> will only use the .lock versions</li>
+  <li>composer.lock is committed into version control</li>
+  <li>Everyone works with <strong>exactly</strong> the same dependency versions</li>
+  <li>When deploying, all machines run <strong>exactly</strong> the same dependency versions</li>
+  <li>Users will never get dependency versions you did not test with</li>
+  <li>For an Upgrade, check the library based on a wildcard.* or dev-BRANCH versions listed in .json</li>
+</ul>
+
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Autoloading</h1>
+
+<p><pre><code>{
+"autoload": {
+    "psr-0": {
+        "Entity": "common/lib/",
+        "ZFDebug": "common/lib/",
+        "BD": "lib/",
+    }
+}
+</code></pre></p>
+
+Using it:
+<p><pre><code>{
+&lt;?php
+require 'vendor/autoload.php';
+$s = new BD_ShortUrl(...);
+?&gt;
+</code></pre></p>
+
+<p>Optimised loaders can be generated.</p>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Testability</h1>
+<ul>
+    <li>Pulling in a local PHPunit, and other tools</li>
+    <li>creates a composer/bin/phpunit, et al</li>
+    <li>Later: Local coding standards</li>
+    <li>you can use on your dev machines, and for CI</li>
+</ul>
+<p><pre><code>
+"require-dev": {
+    "phpunit/phpunit": "~3.7.10",
+    "squizlabs/php_codesniffer": "*",
+    "mockery/mockery": "0.8.0"
+},
+</code></pre></p>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>The potential problems</h1>
+
+<dl class="incremental">
+  <dt>Can't fetch the external code</dt>
+  <dd> - proxy problems to the outside world from dev boxes (run diag)<br/></dd>
+</dl>
+
+<dl class="incremental">
+  <dt>Larger 'vendor' directories</dt>
+  <dd> - its designed to be just-in-time delivery of the code, from cache<br/></dd>
+</dl>
+
+<dl class="incremental">
+  <dt>Complex composer configs with our own small library repositories</dt>
+  <dt>Vendoring 3rd party libraries for fast access, and security checks</dt>
+  <dd> - <a href="https://github.com/composer/satis/#readme">Satis</a>,
+    Package Repository Generator</dd>
+</dl>
+
+<dl class="incremental">
+  <dt>btw, thanks to Chris for simplifying the common module (symlink)
+    in the main BD repo</dt>
+</dl>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>In Summary</h1>
+
+<ul class="incremental">
+  <li>Easy code reuse</li>
+  <li>From small (potentially) well-tested libraries</li>
+  <li>Well supported by libraries</li>
+  <li>Easy, consistent, build process (already supported with the CI server)</li>
+  <li>Fast autoloader scripts, that 'just work'</li>
+  <li>Easily used, one .json file in a repo enables its use in Composer</li>
+  <li>Versioned individually by Git Tags or Branches, or even specific SHA1s</li>
+  <li>A 'composer install' will use exactly the version you tested with</li>
+</ul>
+
+<div class="handout">
+Composer introduction talk
+
+Other slidesdecks
+http://www.slideshare.net/naderman/composer-php-usergroup-karlsruhe
+http://www.slideshare.net/loalf/shifting-gears-with-composer
+http://www.slideshare.net/chebba/composer-package-management-for-php-silver-bullet
+http://www.slideshare.net/zfconf/zfconf-2012-dependency-management-php-zend-framework-2
+http://www.slideshare.net/tcorrigan1/composer-14745871
+
+The Wonderful World of Composer, video from KnpUniversity
+http://www.youtube.com/watch?v=QOldVDVYnAE  (14 minutes)
+
+http://nelm.io/blog/2011/12/composer-part-1-what-why/
+http://nelm.io/blog/2011/12/composer-part-2-impact/
+http://moquet.net/blog/5-features-about-composer-php/
+http://blog.dubture.com/2013/04/composer-is-now-first-class-eclipse.html
+http://blog.fortrabbit.com/handle-your-dependencies-with-php-composer/
+</div><!-- /.handout -->
+
+
+</div>
+
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Thanks</h1>
+<ul>
+
+    <li>Presented, 10th May 2013 at a 'TBD/The Best Developers' session at The Book Depository, Slough</li>
+    <li style="clear:left">Composer at <a href="http://getcomposer.org/">http://getcomposer.org/</a></li>
+    <li style="clear:left">The homepage for this, with a live-viewable version is at my homepage,
+        <a href="http://alister.github.io/presentations/">http://alister.github.io/presentations/</a></li>
+    <li>Also see the <a href="http://knpuniversity.com/screencast/composer">KnpUniversity Composer tutorial screencast</a></li>
+
+</ul>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Questions?</h1>
+
+<p><strong>Alister Bulman</strong></p>
+<ul>
+    <li><a href="http://abulman.co.uk/">http://abulman.co.uk/</a></li>
+    <li><a href="http://alister.github.io/">http://alister.github.io/</a></li>
+    <li><a href="http://twitter.com/alister_b">@alister_b</a></li>
+</ul>
+
+<p><strong>... and elsewhere, just search for me - I'm pretty unique</strong></p>
+<ul>
+    <li><a href="http://alister.github.io">http://alister.github.io</a></li>
+    <li><a href="http://abulman.co.uk/tag/presentation/">http://abulman.co.uk/tag/presentation/</a></li>
+</ul>
+
+</div>
+
+</div--><!-- /div class="presentation" -->
+
+</body>
+</html>

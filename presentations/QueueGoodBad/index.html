@@ -1,0 +1,393 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>The Good and Bad of Queuing</title>
+<!-- metadata -->
+<meta name="generator" content="S5" />
+<meta name="version" content="S5 1.1" />
+<meta name="presdate" content="20100425" />
+<meta name="author" content="Alister Bulman" />
+<meta name="company" content="n/a" />
+<!-- configuration parameters -->
+<meta name="defaultView" content="slideshow" />
+<meta name="controlVis" content="hidden" />
+<!-- style sheet links  -->
+<link rel="stylesheet" href="ui/default/slides.css" type="text/css" media="projection" id="slideProj" />
+<link rel="stylesheet" href="ui/default/outline.css" type="text/css" media="screen" id="outlineStyle" />
+<link rel="stylesheet" href="ui/default/print.css" type="text/css" media="print" id="slidePrint" />
+<link rel="stylesheet" href="ui/default/opera.css" type="text/css" media="projection" id="operaFix" />
+<!-- embedded styles -->
+<!-- S5 JS -->
+<script src="ui/default/slides.js" type="text/javascript"></script>
+<style type="text/css" media="all">
+.imgcon {width: 525px; margin: 0 auto; padding: 0; text-align: center;}
+#anim {width: 270px; height: 320px; position: relative; margin-top: 0.5em;}
+#anim img {position: absolute; top: 42px; left: 24px;}
+img#me01 {top: 0; left: 0;}
+img#me02 {left: 23px;}
+img#me04 {top: 44px;}
+img#me05 {top: 43px;left: 36px;}
+blockquote {text-align: left; color: black;}
+</style>
+</head>
+<body>
+
+<div class="layout">
+<div id="controls"><!-- DO NOT EDIT --></div>
+<div id="currentSlide"><!-- DO NOT EDIT --></div>
+<div id="header"></div>
+<div id="footer">
+<h1>The Good and Bad of Queuing</h1>
+<h2>London Scalability Group &#8226; 16th July 2012</h2>
+</div>
+</div>
+
+<div class="presentation">
+
+<div class="slide">
+<h1>The good and bad of Queuing</h1>
+<p>London Scalability Group &#8226; 16th July 2012.   <a href="https://twitter.com/#!/search/realtime/%23ldnscale">#ldnscale</a></p>
+
+<h3>Alister Bulman</h3>
+<p><ul>
+    <li><a href="http://abulman.co.uk/">http://abulman.co.uk</a></li>
+    <li><a href="http://phpscaling.com">http://phpscaling.com</a></li>
+    <li><a href="http://twitter.com/alister_b">@alister_b</a></li>
+</ul></p>
+
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+
+<h1>self::about()</h1>
+<h2>self::current()</h2>
+<p><a href="viewfrom13th.jpg"><img src="viewfrom13th.small.jpg" alt="view from the 13th floor" align="right"></a>
+Scaling PHP-based systems, with related technologies. Currently working on a 
+<a href="http://praxis-networks.com">'secret project'</a> in our secret volcano 
+base, half-way up the Centre Point tower.... 
+
+<p><small>(OK, so it's the 13th floor, and we are eye-to-eye with a crane-driver)<br/>
+  I might be able to tell you more very soon</small></p>
+
+<h2>self::prev()</h2>
+<p>Programming PHP since 1999, PHP v3, (>12 years ago). Previously in 
+everything from a ZX81, BBC/Electron, 6502 to 8086 Assembler, Pascal and C/C++ 
+before PHP</p>
+
+  <div class="handout">
+    <p>Programming since 198-cough</p>
+  </div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Classic uses of a queue</h1>
+<ul><li>image/video resizing</li>
+    <li>fetching from an external service (eg, RSS feeds, or Twitter)</li>
+    <li>Twitter uses various queues to move data around internally</li>
+</ul>
+
+  <div class="handout"></div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>various queue systems</h1>
+<ul>
+  <li>Amazon SQS</li>
+  <li>beanstalkd</li>
+  <li>LJ's Gearman - and its follow-on superset, TheSwartz</li>
+  <li>RabbitMQ, written in Erlang (recently bought by Springsource/VMWare) - built in London</li>
+  <li>Sparrow, Starling, and now Kestrel by Twitter</li>
+  <li>other heavyweight MQs, Apache's ActiveMQ, Tibco, WebSphere MQ 'message bus'</li>
+  <li>and many, many others 
+      <ul><li>including SQL databases</li></ul>
+  </li>
+  <li>Special mention of ZMQ</li>
+</ul>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>What I've done with queues</h1>
+<ul class="incremental">
+  <li>250,000 emails from a dating website</li>
+      <li>PEAR's Mail_Queue, 50 at a time</li>
+      <li>self-limited the sending - LdAvg &lt; 2</li>
+      <li><em>Later:</em> why the general case of using a DB isn't the best idea</li>
+  <li>Why Beanstalkd?</li>
+      <li>~3.5million requests a day from Twitter - 100 at a time</li>
+      <li>we topped out at 40req/s with SQS (across the atlantic)</li>
+      <li> - still did millions req/day with SQS</li>
+      <li>Beanstalk had priorities - controlled what data was next</li>
+</ul>
+
+  <div class="handout"></div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Hang on to your hats</h1>
+
+  <p>Beanstalkd live demo</p>
+  <p>Putting 1000 items in - and then taking them out</p>
+  <ul class="incremental">
+    <li>want to see it again?</li>
+    <li>100,000 JSON-strings items entered in ~70 seconds.</li>
+    <li>In production.</li>
+    <li>On Amazon EC2.</li>
+  </ul>
+
+  <div class="handout"></div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Here's the good</h1>
+<h3>asyncronous!</h3>
+
+<p><img src="Msmq.jpg" width="518" height="210" alt="Msmq" align="right" />
+Many long running, or intensive tasks could be done in the background</p>
+<p> - Background or Parallel Processing</p>
+
+<hr/>
+<ul class="incremental">
+<li>processing images or videos</li>
+<li>Sending out emails</li>
+<li>Fetching information in the background - like RSS feeds</li>
+<li>Preparing information for later use</li>
+</ul>
+
+  <div class="handout">
+    <p>The classic problem is image uploads. Even happy-snap digital cameras 
+    can produce an image that is 3-4+ megabytes.  You can't just store that 
+    and end up resizing it in the browser. You have to resize it, but you also 
+    can't do it in the same PHP process that uploaded it - it takes too much 
+    time - and memory.</p>
+    <p>Even the pic from the 13th floor was 780KB on disk, at least 15MB memory - just to view. To resize, could be 30MB or more.</p>
+    <p>Don't even try to resize 5+ GB of 1080p quality HD video</p>
+    <p>Use of queues at Flickr<br />
+        - the most popular use isn't even about resizing images</p>
+  </div>
+
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>The Advantages</h1>
+<ul>
+<li>Parallel and/or asyncronous work
+  <ul>
+    <li>it's too much to do while we wait</li>
+    <li>do it in the background, while we are doing other things</li>
+  </ul>
+</li>
+<li>Scales easily - run more workers
+  <ul>
+    <li>if the work can be done independently of data</li>
+    <li>workers can be run almost anywhere within your cluster</li>
+    <li>particular jobs can also be directed to specific machines</li>
+  </ul>
+</li>
+<li>Call functionality written in other languages</li>
+<li>With a good infrastructure, adding in new tasks are trivial</li>
+</ul>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>The Bad</h1>
+<h2>Over enthusiasm</h2>
+
+<ul class="incremental">
+  <li>too many steps can lead to balancing problems</li>
+  <li>- more than just two might be too many</li>
+  <li>- consider merging the steps - don't have so many</li>
+
+  <li style="max-width: 100%; font-size: .5em; color:black"><blockquote>
+    Different stages of your system will run at different speeds, and you'll end up with upstream tasks creating 
+      ever-growing backlogs when they feed into slower consumers. ... the only real solution is carefully 
+      tuning the speed of the original inputs to match the available resources. This is not fun.<br/>
+    <small>-- <a href="http://petewarden.typepad.com/searchbrowser/2011/06/queues-are-the-devils-own-data-structures.html">Pete Warden: June 2011: Queues are the devils own data structures</a> </small>
+    - Pete thinks Hadoop can handle a lot of this.
+    </blockquote>
+  </li>
+</ul>
+
+  <div class="handout">
+    <ul>
+      <li><a href="http://petewarden.typepad.com/searchbrowser/2011/06/queues-are-the-devils-own-data-structures.html">queues are the devils own data structures</a></li>
+      <li><a href="https://twitter.com/hivetheory/status/84124927254470657">Twitter engineer James Waldrop (‏@HiveTheory) doesn't think so</a></li>
+      <li><a href="http://petewarden.typepad.com/searchbrowser/2011/06/am-i-wrong-about-queues-being-satans-little-helpers.html">Am i wrong about queues being Satan's little helpers</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>The Bad, II</h1>
+<h2>If things go wrong</h2>
+
+<ul class="incremental">
+  <li>You have to be very careful of failures</li>
+  <li>hard to see what happens when they fail</li>
+  <li>worst case: they fail, and go back to the queue - </li>
+  <li>where they fail over and over again</li>
+  <li>put all failures into a 'sin bin', and fix ruthlessly</li>
+</ul>
+
+  <div class="handout">
+  </div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>The Bad, III</h1>
+<h2>Setting up and running</h2>
+
+<ul class="incremental">
+  <li>some ideas and HowTo's at <a href="http://www.phpscaling.com/tag/queues/">http://phpscaling.com/tag/queues/</a>
+      - <a href="http://www.phpscaling.com/2009/06/23/doing-the-work-elsewhere-sidebar-running-the-worker">Doing the work elsewhere - sidebar "running the worker"</a>
+  </li>
+  <li>Upstart or Supervisord, and shell scripts to start/keep things running.</li>
+  <li>Be able to shutdown workers at will (shedding load)</li>
+  <li>I'm still looking for better ways</li>
+</ul>
+
+  <div class="handout">
+  </div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Queueing via a DB :: Anti-pattern</h1>
+<ul>
+<li>An obvious early step</li>
+<li>Not actually so well suited, especially with many transactions <br />
+  <small>high transaction costs - locking to ensure only one worker can get a message</small>
+</li>
+<li>PEAR's Mail_Queue <small>can work very well with small number of 'workers'</small></li>
+<li>A lot simpler that throwing large numbers of large messages into a formal queue</li>
+</ul>
+<hr/>
+
+<ul>
+  <li>Polling</li>
+  <li>Locking</li>
+  <li>Data growth</li>
+</ul>
+<!-- http://www.engineyard.com/blog/2011/5-subtle-ways-youre-using-mysql-as-a-queue-and-why-itll-bite-you/ -->
+
+  <div class="handout">
+      <p>If you are deleting items from the queue as they are being sent, then you know the DB
+        can be good for millions of records</p>
+  </div>
+
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Beanstalkd</h1>
+
+<p>Many language bindings are available</p>
+<p>Quite easy to write, as it's a simple text-based format, ala Memcached</p>
+
+<p>The daemon is equally dumb as a classic MemcacheD. Talking to multiple 
+servers is done from the client-side.</p>
+
+<p><strong>Blocking</strong><br />
+<small>I'll wait here till you have something</small></p>
+
+  <div class="handout">
+    <p>BeanstalkD was written in C for a Facebook app called 'Causes' - 
+    which was written in RubyOnRails</p>
+    <p>Not to be confused with the 'Beanstalkapp.com', which is remote 
+     SVN &amp; GIT version control</p>
+    <p>OR WITH Amazon's Beanstalk to start EC2 and other AWS services</p>
+  </div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>What to send through the queue?</h1>
+<ul>
+    <li>'Clean URLs':
+        <ul><li>/tasks/image/resize/filename/example.jpg/sizeX/640/sizeY/480</li>
+            <li>/tasks/member/logintasks/id/12345</li>
+            <li>/tasks/mail/fetchcounts/id/12345</li>
+        </ul>
+    <li>PHP's serialize/deserialize</li>
+    <li>JSON
+        <ul><li>{"module":"task","controller":"image","action":"resize",
+                 &nbsp;&nbsp;"params":{"filename":"example1.jpg"}}</li>
+        </ul>
+    </li>
+    <li>plain text: RESTART, STOP, UPDATE-COUNTS</li>
+</ul>
+<p>64KB default limit.</p>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>In Summary</h1>
+
+<ul class="incremental">
+  <li>Job queuing systems can give a lot of flexibility to pass messages into background processing</li>
+  <li>Background tasks are not subject to the same limits as a webpage would be - time or memory</li>
+
+  <li>Limited by your imagination on how to use it</li>
+  <li>Getting it right is not easy</li>
+</ul>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Thanks</h1>
+<ul>
+    <li>London Scalability Group</li>
+    <li style="clear:left">Beanstalkd FAQ and github pages at <a href="http://kr.github.com/beanstalkd/">http://kr.github.com/beanstalkd/</a></li>
+    <li>Pheanstalk (php library) on Github: <a href="http://github.com/pda/pheanstalk/">http://github.com/pda/pheanstalk</a></li>
+    <li>Livejournal's scaling and the technology that got me interested in all of this (<a href="http://www.danga.com/words/2005_oscon/oscon-2005.pdf">oscon presentation, 2005</a>, PDF link)</li>
+</ul>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Questions ?</h1>
+<ul>
+    <li>Alister Bulman</li>
+    <li><a href="http://abulman.co.uk/">http://abulman.co.uk/</a></li>
+    <li><a href="http://www.phpscaling.com/tag/queues/">http://phpscaling.com/tag/queues/</a></li>
+    <li><a href="http://twitter.com/alister_b">@alister_b</a></li>
+    <li>... and elsewhere</li>
+    <li><a href="https://twitter.com/#!/search/realtime/%23ldnscale">#ldnscale</a></li>
+</ul>
+
+<ul>
+    <li>This will be posted soon at <a href="http://abulman.co.uk/tag/presentation/">http://abulman.co.uk/tag/presentation/</a></li>
+
+</ul>
+
+</div>
+
+</div><!-- /div class="presentation" -->
+
+</body>
+</html>

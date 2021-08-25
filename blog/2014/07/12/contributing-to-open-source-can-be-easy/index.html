@@ -1,0 +1,200 @@
+<!doctype html><html xmlns=http://www.w3.org/1999/xhtml xml:lang=en lang=en-us>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,minimum-scale=1,maximum-scale=1">
+<link href=/css/fonts.css rel=stylesheet type=text/css>
+<title>Contributing to open source can be easy</title>
+<link rel=stylesheet href=/css/hugo-octopress.css>
+<link rel=stylesheet href=/css/fork-awesome.min.css>
+<link href=https://alister.github.io/favicon.png rel=icon>
+<meta name=description content>
+<meta name=keywords content>
+<meta name=author content="Alister Bulman">
+<meta name=generator content="Hugo 0.87.0">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="Contributing to open source can be easy">
+<meta name=twitter:description content="Although I&rsquo;m busy day to day at my current contract *, that isn&rsquo;t to say that my passions outside the office have come to a complete stop. I&rsquo;m still going to regular meetups (like the PHP London Meetup and Docker London), and I&rsquo;m also planning to go to Symfony Live London 2014. I&rsquo;ve also been reading about, and trying some software, and making the odd fix and new code for myself.">
+<meta name=twitter:domain content="alister.github.io">
+<meta name=twitter:creator content="@alister_b">
+</head>
+<body>
+<header role=banner>
+<hgroup>
+<h1><a href=https://alister.github.io/>Professional Blog</a></h1>
+<h2>A few things I've been up to</h2>
+</hgroup></header>
+<nav role=navigation>
+<fieldset class=mobile-nav>
+<select onchange="location=this.value"><option value>Navigate…</option><option value=https://alister.github.io/blog/>» Blog archive</option><option value=https://alister.github.io/presentations/>» Presentations</option></select>
+</fieldset>
+<ul class=main-navigation>
+<li><a href=https://alister.github.io/blog/ title="Blog archive" rel="noopener noreferrer">Blog archive</a></li>
+<li><a href=https://alister.github.io/presentations/ title=Presentations rel="noopener noreferrer">Presentations</a></li>
+</ul>
+<ul class=subscription>
+<a href=https://alister.github.io/index.xml target=_blank type=application/rss+xml title=RSS rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+</ul>
+<form action=https://www.google.com/search method=get target=_blank rel="noopener noreferrer">
+<fieldset role=search>
+<input class=search type=text name=q results=0 placeholder=Search>
+<input type=hidden name=q value=site:https://alister.github.io/>
+</fieldset>
+</form>
+</nav>
+<div id=main>
+<div id=content>
+<div>
+<article class=hentry role=article>
+<header>
+<p class=meta>Jul 12, 2014
+- 4 minute read
+</p>
+<h1 class=entry-title>
+Contributing to open source can be easy
+</h1>
+</header>
+<div class=entry-content>
+<nav id=TableOfContents>
+<ul>
+<li>
+<ul>
+<li><a href=#capistrano-tagger---quick-fix-to-remove-whitespace-around-sha1-hash>Capistrano tagger - Quick fix to remove whitespace around sha1 hash</a></li>
+<li><a href=#phpdox---correct-source-name-in-errors-phpunit-not-phploc>PHPDox - Correct source name in errors, PHPUnit, not PHPloc</a></li>
+<li><a href=#frequencewebcontactbundle---improved-english-language-translation>FrequenceWebContactBundle - Improved English language translation</a></li>
+<li><a href=#rails3-multi-oauth-logins-with-omniauth>Rails3 multi-Oauth logins with OmniAuth</a></li>
+<li><a href=#faker-extensions>faker-extensions</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<p>Although I&rsquo;m busy day to day at my current contract *, that isn&rsquo;t to say that my passions outside the office have come to a complete stop. I&rsquo;m still going to regular meetups (like the
+<a href=https://www.meetup.com/phplondon/ target=_blank rel=noopener>PHP London Meetup</a> and
+<a href=https://www.meetup.com/Docker-London/events/192394082/ target=_blank rel=noopener>Docker London</a>), and I&rsquo;m also planning to go to
+<a href=https://london2014.live.symfony.com/ target=_blank rel=noopener>Symfony Live London 2014</a>. I&rsquo;ve also been reading about, and trying some software, and making the odd fix and new code for myself.</p>
+<p>I thought that it would be good to show some of the work I&rsquo;ve been doing out of hours - some of it trivially easy - that I&rsquo;ve done to help improve a few projects, and also some slightly larger things of my own.</p>
+<p>(* Developing systems for Her Majesty&rsquo;s Passport Office, in the Home Office)</p>
+<h2 id=capistrano-tagger---quick-fix-to-remove-whitespace-around-sha1-hash>Capistrano tagger - Quick fix to remove whitespace around sha1 hash</h2>
+<p>I regularly look around for new tools that can help me, even just a little, to make like just that bit easier.
+<a href=https://capistranorb.com/ target=_blank rel=noopener>Capistrano</a> (
+<a href=https://github.com/capistrano/capistrano target=_blank rel=noopener>Capistrano on github</a>) makes deploying code easy, repeatable and fast. Being able to tag the most recently deployed version is useful to be able to refer back. I&rsquo;ve got projects that are using both version 2 & 3 of Capistrano (v3 is a complete rewrite of v2, so it&rsquo;s not so easy to upgrade, but v2 still works just fine).</p>
+<p>
+<a href=https://github.com/forward/capistrano-deploy-tagger target=_blank rel=noopener>capistrano-deploy-tagger</a> is an internal project, open-sourced by the
+<a href=http://forwardtechnology.co.uk/ target=_blank rel=noopener>Forward 3D</a>. I&rsquo;ve been to their offices several times for Devops and GoLang meet-ups, among others.</p>
+<p>It&rsquo;s easy to add this Capistrano plugin to help tag things when I deployed them - to know exactly when things happened. Trouble was, it didn&rsquo;t work for me. I narrowed things down to the response from Git having a newline in front of it, so I
+<a href=https://github.com/forward/capistrano-deploy-tagger/commit/7c30ea8be8004c6bfee0d1c7bb27b1383043f4bd target=_blank rel=noopener>added a &lsquo;strip!&rsquo; to the appropriate variable</a>, which removed the errant white-space. There&rsquo;s probably a better way to do it, with some more behind-the-scenes git command, but this works for now, and solved my problem to boot.</p>
+<p>I could have just left my fix in my local copy, and it would have worked quite nicely (at least till I went to upgrade the gem), but submitting a merge-request and having
+<a href=https://github.com/Rylon target=_blank rel=noopener>Ryan Conway</a> pull it in, helps everybody - and now I get to automatically tag my deployments.</p>
+<h2 id=phpdox---correct-source-name-in-errors-phpunit-not-phploc>PHPDox - Correct source name in errors, PHPUnit, not PHPloc</h2>
+<p>I created my
+<a href=https://github.com/alister/personal-ci target=_blank rel=noopener>personal-ci</a> meta-project to pull in various PHP-based testing and documentation tools with
+<a href=https://getcomposer.org/ target=_blank rel=noopener>Composer</a>. One of those was
+<a href=https://github.com/theseer/phpdox target=_blank rel=noopener>PHPDox</a>, and it does a good job of processing the projects to make some good looking documentation.</p>
+<p>While developing the personal-ci system, I&rsquo;d been running PHPDox regularly with the rest, and getting some errors from not having all the files in place first (some of the additional logging output of PHPUnit). Trouble was, it was complaining about something that was there - some PHPLoc logs. So, I grepped the source for the message, and found two copies. One was in a class dealing with PHPUnit though - not the PHPLoc that was being reported - so the fix was just changing a couple of
+<a href=https://github.com/theseer/phpdox/pull/141 target=_blank rel=noopener>error message strings</a> to show the right program.</p>
+<p>A very simple change - a text-only bug, that confused (at least) me, and I could find an improvement.</p>
+<h2 id=frequencewebcontactbundle---improved-english-language-translation>FrequenceWebContactBundle - Improved English language translation</h2>
+<p>I was looking around for a contact-bundle for a project - a simple form to email system. Among my travels around Packagist & Github, I found
+<a href=https://github.com/yohang/FrequenceWebContactBundle/ target=_blank rel=noopener>FrequenceWebContactBundle</a>.</p>
+<p>This is another really trivial change - a couple of lines of
+<a href=https://github.com/yohang/FrequenceWebContactBundle/pull/5 target=_blank rel=noopener>improved translation</a>. The original author of the project is French, I could fork and edit the file right in the browser (on Github) and make a pull-request in just a moment.</p>
+<h2 id=rails3-multi-oauth-logins-with-omniauth>Rails3 multi-Oauth logins with OmniAuth</h2>
+<p>I couldn&rsquo;t find a good tutorial on using the Ruby-on-rails gem &lsquo;Omniauth&rsquo;, with more than one authentication method, so that you could then login with any connected account into the same user.
+<a href=https://github.com/alister/rails3-omniauth-multi_tutsplus target=_blank rel=noopener>So I wrote one :)</a>.</p>
+<p>I&rsquo;m still looking for a good PHP-based equivalent though (using
+<a href=https://github.com/hwi/HWIOAuthBundle target=_blank rel=noopener>HWIOAuthBundle</a>). In fact, until I had to depreciate the part of a new site that was going to use it,
+<a href=https://github.com/hwi/HWIOAuthBundle/issues/424 target=_blank rel=noopener>I offered a bounty</a> to be able to get some good example code - with suitable documentation - written. That issue remains unanswered, and HWIOAuthBundle still doesn&rsquo;t have a really good sample..</p>
+<h2 id=faker-extensions>faker-extensions</h2>
+<p>My newest open source code is
+<a href=https://github.com/alister/faker-extensions target=_blank rel=noopener>faker-extensions</a>. The actual code that is being run is really trivial - two classes and a total of three functions and then as many lines of actual code (plus some simple tests) - and two of those lines just call someone else&rsquo;s methods, with a little local data. Its the local data that makes it interesting, and useful.</p>
+<p>The classes (and tests I wrote for completeness) were actually pulled out of a private project - something I hope to be able to continue to do more of. Even though its so trivial, it is still a useful little library because I&rsquo;ve also taken the opportunity to to try out a few new things with some public services.</p>
+<ul>
+<li>
+<a href=https://packagist.org/packages/alister/faker-extensions target=_blank rel=noopener>Packagist</a>
+<a href=https://packagist.org/packages/alister/faker-extensions target=_blank rel=noopener><img src=https://poser.pugx.org/alister/faker-extensions/v/stable.svg alt="Latest Stable Version"></a>
+<a href=https://packagist.org/packages/alister/faker-extensions target=_blank rel=noopener><img src=https://poser.pugx.org/alister/faker-extensions/downloads.svg alt="Total Downloads"></a>
+<a href=https://packagist.org/packages/alister/faker-extensions target=_blank rel=noopener><img src=https://poser.pugx.org/alister/faker-extensions/v/unstable.svg alt="Latest Unstable Version"></a>
+<a href=https://packagist.org/packages/alister/faker-extensions target=_blank rel=noopener><img src=https://poser.pugx.org/alister/faker-extensions/license.svg alt=License></a></li>
+</ul>
+<p>Packagist badges are available from
+<a href=https://poser.pugx.org/ target=_blank rel=noopener>poser.pugx.org</a></p>
+</div>
+<footer>
+<p class=meta>
+<span class="byline author vcard">Posted by <span class=fn>Alister Bulman</span></span>
+<time>Jul 12, 2014</time>
+<span class=categories>
+Tags:
+<a class=category href=https://alister.github.io/tags/opensource>opensource</a> <a class=category href=https://alister.github.io/tags/github>github</a> <a class=category href=https://alister.github.io/tags/packagist>packagist</a> <a class=category href=https://alister.github.io/tags/git>git</a> <a class=category href=https://alister.github.io/tags/hwioauthbundle>HWIOAuthBundle</a> <a class=category href=https://alister.github.io/tags/omniauth>omniauth</a> <a class=category href=https://alister.github.io/tags/capistrano>Capistrano</a> <a class=category href=https://alister.github.io/tags/forward3d>forward3d</a> <a class=category href=https://alister.github.io/tags/docker>docker</a> <a class=category href=https://alister.github.io/tags/phplondon>phplondon</a> <a class=category href=https://alister.github.io/tags/phpdox>phpdox</a> <a class=category href=https://alister.github.io/tags/faker-extensions>faker-extensions</a>
+</span>
+</p>
+<p class=meta>
+<a class="basic-alignment left" href=https://alister.github.io/blog/2013/02/17/not-having-your-developers-quit-on-you-as-a-service/ title="Not having your developers quit on you - as a service">Not having your developers quit on you - as a service</a>
+</p>
+</footer>
+</article>
+</div>
+<aside class="sidebar thirds">
+<section class="first odd">
+<h1>Sidebar</h1>
+<p>
+Re-created with Hugo, Auguest 2021.
+</p>
+</section>
+<ul class=sidebar-nav>
+<li class=sidebar-nav-item>
+<a target=_blank rel="noopener noreferrer" href=https://github.com/alister title=https://github.com/alister><i class="fa fa-github-square fa-3x"></i></a>
+<a target=_blank rel="noopener noreferrer" href=https://bitbucket.org/alisterb/ title=https://bitbucket.org/alisterb/><i class="fa fa-bitbucket-square fa-3x"></i></a>
+<a target=_blank rel="noopener noreferrer" href=https://twitter.com/alister_b/ title=https://twitter.com/alister_b/><i class="fa fa-twitter-square fa-3x"></i></a>
+<a target=_blank rel="noopener noreferrer" href=https://www.linkedin.com/in/alisterbulman title=https://www.linkedin.com/in/alisterbulman><i class="fa fa-linkedin-square fa-3x"></i></a>
+<a target=_blank rel="noopener noreferrer" href=https://stackoverflow.com/users/6216/alister-bulman title=https://stackoverflow.com/users/6216/alister-bulman><i class="fa fa-stack-overflow-square fa-3x"></i></a>
+<a href=https://alister.github.io/index.xml type=application/rss+xml title=RSS><i class="fa fa-rss-square fa-3x"></i></a>
+</li>
+<a href=https://stackexchange.com/users/4189><img src=https://stackexchange.com/users/flair/4189.png width=208 height=58 alt="profile for Alister Bulman on Stack Exchange, a network of free, community-driven Q&A sites" title="profile for Alister Bulman on Stack Exchange, a network of free, community-driven Q&A sites"></a>
+</ul>
+<section class=odd>
+</section>
+<section class=even>
+<h1>Recent Posts</h1>
+<ul id=recent_posts>
+</ul>
+</section>
+<div class=sidebar-section>
+<h3>Tags</h3>
+<ul style=list-style-type:none;padding:0;margin:0>
+<a href=/tags/dns>dns (2)</a>
+<a href=/tags/anti-pattern>anti-pattern (1)</a>
+<a href=/tags/capistrano>capistrano (1)</a>
+<a href=/tags/contract>contract (1)</a>
+<a href=/tags/docker>docker (1)</a>
+<a href=/tags/employment>employment (1)</a>
+<a href=/tags/faker-extensions>faker-extensions (1)</a>
+<a href=/tags/forward3d>forward3d (1)</a>
+<a href=/tags/freelance>freelance (1)</a>
+<a href=/tags/git>git (1)</a>
+<a href=/tags/github>github (1)</a>
+<a href=/tags/hwioauthbundle>hwioauthbundle (1)</a>
+<a href=/tags/linux>linux (1)</a>
+<a href=/tags/mysql>mysql (1)</a>
+<a href=/tags/omniauth>omniauth (1)</a>
+<a href=/tags/opensource>opensource (1)</a>
+<a href=/tags/packagist>packagist (1)</a>
+<a href=/tags/phpdox>phpdox (1)</a>
+<a href=/tags/phplondon>phplondon (1)</a>
+<a href=/tags/presentations>presentations (1)</a>
+<a href=/tags/rant>rant (1)</a>
+<a href=/tags/repost>repost (1)</a>
+<a href=/tags/scaling>scaling (1)</a>
+<a href=/tags/wordpress>wordpress (1)</a>
+</ul>
+</div>
+</aside>
+</div>
+</div>
+<footer role=contentinfo>
+<p>Copyright &copy; 2021 Alister Bulman -
+<span class=credit>Powered by <a target=_blank href=https://gohugo.io rel="noopener noreferrer">Hugo</a> and <a target=_blank href=https://github.com/parsiya/hugo-octopress/ rel="noopener noreferrer">Hugo-Octopress</a> theme.
+</p>
+</footer>
+<script>var _gaq=[['_setAccount','UA-37346894-1'],['_trackPageview']];(function(a,b){var c=a.createElement(b),d=a.getElementsByTagName(b)[0];c.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js',d.parentNode.insertBefore(c,d)})(document,'script')</script>
+</body>
+</html>

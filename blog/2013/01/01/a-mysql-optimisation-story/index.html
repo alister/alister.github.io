@@ -1,0 +1,157 @@
+<!doctype html><html xmlns=http://www.w3.org/1999/xhtml xml:lang=en lang=en-us>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,minimum-scale=1,maximum-scale=1">
+<link href=/css/fonts.css rel=stylesheet type=text/css>
+<title>A MySQL optimisation Story</title>
+<link rel=stylesheet href=/css/hugo-octopress.css>
+<link rel=stylesheet href=/css/fork-awesome.min.css>
+<link href=https://alister.github.io/favicon.png rel=icon>
+<meta name=description content>
+<meta name=keywords content>
+<meta name=author content="Alister Bulman">
+<meta name=generator content="Hugo 0.87.0">
+<meta name=twitter:card content="summary">
+<meta name=twitter:title content="A MySQL optimisation Story">
+<meta name=twitter:description content="Here is an example of what a little expertise, judiciously applied can do to speed up larger systems. In this case, take a 30 minute run against a MySQL database down to 5 minutes, or less.">
+<meta name=twitter:domain content="alister.github.io">
+<meta name=twitter:creator content="@alister_b">
+</head>
+<body>
+<header role=banner>
+<hgroup>
+<h1><a href=https://alister.github.io/>Professional Blog</a></h1>
+<h2>A few things I've been up to</h2>
+</hgroup></header>
+<nav role=navigation>
+<fieldset class=mobile-nav>
+<select onchange="location=this.value"><option value>Navigate…</option><option value=https://alister.github.io/blog/>» Blog archive</option><option value=https://alister.github.io/presentations/>» Presentations</option></select>
+</fieldset>
+<ul class=main-navigation>
+<li><a href=https://alister.github.io/blog/ title="Blog archive" rel="noopener noreferrer">Blog archive</a></li>
+<li><a href=https://alister.github.io/presentations/ title=Presentations rel="noopener noreferrer">Presentations</a></li>
+</ul>
+<ul class=subscription>
+<a href=https://alister.github.io/index.xml target=_blank type=application/rss+xml title=RSS rel="noopener noreferrer"><i class="fa fa-rss-square fa-lg"></i></a>
+</ul>
+<form action=https://www.google.com/search method=get target=_blank rel="noopener noreferrer">
+<fieldset role=search>
+<input class=search type=text name=q results=0 placeholder=Search>
+<input type=hidden name=q value=site:https://alister.github.io/>
+</fieldset>
+</form>
+</nav>
+<div id=main>
+<div id=content>
+<div>
+<article class=hentry role=article>
+<header>
+<p class=meta>Jan 1, 2013
+- 5 minute read
+</p>
+<h1 class=entry-title>
+A MySQL optimisation Story
+</h1>
+</header>
+<div class=entry-content>
+<p>Here is an example of what a little expertise, judiciously applied can do to speed up larger systems. In this case, take a 30 minute run against a MySQL database down to 5 minutes, or less.</p>
+<p>Back in Mid-December (2012), I got an email (via LinkedIn) out of the blue from a web development company in Hampshire. They needed some help with a database they were finishing off for a customer. The site itself barely touched the DB, but instead the heavy lifting was being done once per hour to read the data through a somewhat convoluted database view that did a lot of the work of joining various small tables against the main, multi-million row, table.</p>
+<p>The regular job was taking around 30 minutes to complete, and then the website then read the results of that to produce the main site pages as required. They wanted to seee how they could speed it up - a lot.</p>
+<p>I&rsquo;ve dealt with issues like this before, a couple of times in fact, and it had helped me got at least one full-time job in the past because I&rsquo;d solved it so easily - stopping the database server crashing a few times a day in the process - so I was happy to take half-hour to talk though the likely scenarios.</p>
+<p>It&rsquo;s a simple enough problem with MySQL servers. They can handle a lot of work, but they don&rsquo;t come with the base configuration to be able to do so. The main issue is having a machine with plenty of memory to handle the amount of data in the database (the sheer megabytes on disk of data), but the <strong>innodb_buffer_pool_size</strong> hasn&rsquo;t been updated to be able to use the memory, so all the information has to squeeze though a mere 8MB (yes, not much more than eight million bytes) of space. Not helpful when the database could be measured in Gigabytes.</p>
+<p>A couple of days later, I drove down the M3 to visit the office and more efficiently deal with their servers (they were firewalled to only talk to the office IP address), and do some other things. The database & its slave was already running a lot faster with the increased buffer_pool memory, in fact it had reduced the time to run the production from 30 minutes to just 5, so there was already a huge win for them. Even then, it was still using just 33% of the ram for the DB on the master, and less than 8.5% on the slave.</p>
+<p>With a few more small tweaks they&rsquo;ve now got plenty of room to grow, and room to easily double the amount of data they are storing in the DB - and they&rsquo;ve also had some tips how to be able to run the regularly scheduled cache-run almost as often as the database can be changed, without having to worry about how long it might end up running (something that you would have to be concerned about it you ran it as a cron-job).</p>
+<p>What was also done:</p>
+<ul>
+<li>Removing redundant indexes - they already had columns as part of the first set of a compound index. More indexes is more space, and more time to produce. If the data already has an index that covers the same data - remove it!</li>
+<li>Enabling the slow-query log showed a couple of places where a full-text search was still being run, although there was a simple column that could provide the same information.</li>
+<li>Reminded them that a string-based UUID as an indexed column was not their friend. The size of the indexes on disk were more than 1.5 times the size of the data! A simple numeric index would be a fraction of the size, and since that would also mean more data in less space, it would equally mean a faster database.</li>
+</ul>
+<p>I put the various database tables into individual files, rather than a single, monolithic file (which was over 20GB on disk). While this doesn&rsquo;t help with backups, and you also have to increase the number of open_files MySQL has, there are some benefits, such as being able to more easily reclaim space from large database tables. It also means that you can see very easily how much disk space each table takes up, so it can be more easily monitored.</p>
+<p>A couple of final things I did was a very quick and easy fix to a PHP-server for a different site. Although the database for the other site was quite small, a quick upgrade of the <strong>innodb_buffer_pool_size</strong> would help them in the future, but the main improvement I left them with was to install APC with an initial 32MB RAM default. Its a useful and easy speedup for any PHP site. The improvement was pretty obvious to see on-screen, and it would have also used less memory in the process.</p>
+<p>So, two websites, with very different needs but both have had substantial improvements in speed. One was entirely back-end and database based, going from a 30 minute turn-around time to regenerate the site from the database to just five minytes, or even less.</p>
+<p>The other a more simple PHP site (in fact, written in
+<a href=https://expressionengine.com/ target=_blank rel=noopener>Expression Engine</a>). Installing APC produces some very easy improvement in web-page render times.</p>
+<p>I hope this has been a useful reminder of how just a little work from a specialist can help your sites can speed up by a great deal.</p>
+</div>
+<footer>
+<p class=meta>
+<span class="byline author vcard">Posted by <span class=fn>Alister Bulman</span></span>
+<time>Jan 1, 2013</time>
+<span class=categories>
+Tags:
+<a class=category href=https://alister.github.io/tags/freelance>freelance</a> <a class=category href=https://alister.github.io/tags/mysql>mysql</a> <a class=category href=https://alister.github.io/tags/linux>linux</a> <a class=category href=https://alister.github.io/tags/scaling>scaling</a>
+</span>
+</p>
+<p class=meta>
+<a class="basic-alignment left" href=https://alister.github.io/blog/2013/01/01/booze-at-tech-meetups/ title="Booze at tech meetups">Booze at tech meetups</a>
+<a class="basic-alignment right" href=https://alister.github.io/blog/2013/01/07/why-i-like-djbdns-tinydns/ title="Why I like djbdns & tinydns">Why I like djbdns & tinydns</a>
+</p>
+</footer>
+</article>
+</div>
+<aside class="sidebar thirds">
+<section class="first odd">
+<h1>Sidebar</h1>
+<p>
+Re-created with Hugo, Auguest 2021.
+</p>
+</section>
+<ul class=sidebar-nav>
+<li class=sidebar-nav-item>
+<a target=_blank rel="noopener noreferrer" href=https://github.com/alister title=https://github.com/alister><i class="fa fa-github-square fa-3x"></i></a>
+<a target=_blank rel="noopener noreferrer" href=https://bitbucket.org/alisterb/ title=https://bitbucket.org/alisterb/><i class="fa fa-bitbucket-square fa-3x"></i></a>
+<a target=_blank rel="noopener noreferrer" href=https://twitter.com/alister_b/ title=https://twitter.com/alister_b/><i class="fa fa-twitter-square fa-3x"></i></a>
+<a target=_blank rel="noopener noreferrer" href=https://www.linkedin.com/in/alisterbulman title=https://www.linkedin.com/in/alisterbulman><i class="fa fa-linkedin-square fa-3x"></i></a>
+<a target=_blank rel="noopener noreferrer" href=https://stackoverflow.com/users/6216/alister-bulman title=https://stackoverflow.com/users/6216/alister-bulman><i class="fa fa-stack-overflow-square fa-3x"></i></a>
+<a href=https://alister.github.io/index.xml type=application/rss+xml title=RSS><i class="fa fa-rss-square fa-3x"></i></a>
+</li>
+<a href=https://stackexchange.com/users/4189><img src=https://stackexchange.com/users/flair/4189.png width=208 height=58 alt="profile for Alister Bulman on Stack Exchange, a network of free, community-driven Q&A sites" title="profile for Alister Bulman on Stack Exchange, a network of free, community-driven Q&A sites"></a>
+</ul>
+<section class=odd>
+</section>
+<section class=even>
+<h1>Recent Posts</h1>
+<ul id=recent_posts>
+</ul>
+</section>
+<div class=sidebar-section>
+<h3>Tags</h3>
+<ul style=list-style-type:none;padding:0;margin:0>
+<a href=/tags/dns>dns (2)</a>
+<a href=/tags/anti-pattern>anti-pattern (1)</a>
+<a href=/tags/capistrano>capistrano (1)</a>
+<a href=/tags/contract>contract (1)</a>
+<a href=/tags/docker>docker (1)</a>
+<a href=/tags/employment>employment (1)</a>
+<a href=/tags/faker-extensions>faker-extensions (1)</a>
+<a href=/tags/forward3d>forward3d (1)</a>
+<a href=/tags/freelance>freelance (1)</a>
+<a href=/tags/git>git (1)</a>
+<a href=/tags/github>github (1)</a>
+<a href=/tags/hwioauthbundle>hwioauthbundle (1)</a>
+<a href=/tags/linux>linux (1)</a>
+<a href=/tags/mysql>mysql (1)</a>
+<a href=/tags/omniauth>omniauth (1)</a>
+<a href=/tags/opensource>opensource (1)</a>
+<a href=/tags/packagist>packagist (1)</a>
+<a href=/tags/phpdox>phpdox (1)</a>
+<a href=/tags/phplondon>phplondon (1)</a>
+<a href=/tags/presentations>presentations (1)</a>
+<a href=/tags/rant>rant (1)</a>
+<a href=/tags/repost>repost (1)</a>
+<a href=/tags/scaling>scaling (1)</a>
+<a href=/tags/wordpress>wordpress (1)</a>
+</ul>
+</div>
+</aside>
+</div>
+</div>
+<footer role=contentinfo>
+<p>Copyright &copy; 2021 Alister Bulman -
+<span class=credit>Powered by <a target=_blank href=https://gohugo.io rel="noopener noreferrer">Hugo</a> and <a target=_blank href=https://github.com/parsiya/hugo-octopress/ rel="noopener noreferrer">Hugo-Octopress</a> theme.
+</p>
+</footer>
+<script>var _gaq=[['_setAccount','UA-37346894-1'],['_trackPageview']];(function(a,b){var c=a.createElement(b),d=a.getElementsByTagName(b)[0];c.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js',d.parentNode.insertBefore(c,d)})(document,'script')</script>
+</body>
+</html>
