@@ -1,0 +1,48 @@
+<small><pre style="background-color: silver"><code>
+$pheanstalk = new Pheanstalk('127.0.0.1');
+for ($i = 10000; $i > 0; $i --) {
+    $pheanstalk->put("job payload goes here\n");
+}
+</code></pre></small>
+
+<h1>And to fetch them</h1>
+<small><pre><code>
+require 'pheanstalk_init.php';
+$pheanstalk = new Pheanstalk('127.0.0.1');
+for ($i = 10000; $i > 0; $i --)
+{
+    $job = $pheanstalk->reserve(2);  // reserve - with timeout
+    if (! $job) {
+       continue;
+    }
+    $job->getData();
+    $pheanstalk->delete($job);
+}
+</code></pre></small>
+
+
+-----
+<h1>Producer (queues jobs)</h1>
+<small><pre style="background-color: silver">
+require_once 'pheanstalk_init.php';
+$pheanstalk = new Pheanstalk('127.0.0.1');
+
+$pheanstalk->useTube('testtube')
+           ->put("job payload goes here\n");
+</pre></small>
+
+
+<h1>worker (performs jobs)</h1>
+<small><pre style="background-color: silver">
+require_once 'pheanstalk_init.php';
+$pheanstalk = new Pheanstalk('127.0.0.1');
+
+$job = $pheanstalk->watch('testtube')
+                  ->ignore('default')
+                  ->reserve();
+
+// <em>handwave</em> to run the job
+echo $job->getData();
+
+$pheanstalk->delete($job);
+</pre></small>

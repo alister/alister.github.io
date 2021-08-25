@@ -1,0 +1,647 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>BeanstalkD: An Introduction to queuing</title>
+<!-- metadata -->
+<meta name="generator" content="S5" />
+<meta name="version" content="S5 1.1" />
+<meta name="presdate" content="20100425" />
+<meta name="author" content="Alister Bulman" />
+<meta name="company" content="n/a" />
+<!-- configuration parameters -->
+<meta name="defaultView" content="slideshow" />
+<meta name="controlVis" content="hidden" />
+<!-- style sheet links -->
+<link rel="stylesheet" href="ui/default/slides.css" type="text/css" media="projection" id="slideProj" />
+<link rel="stylesheet" href="ui/default/outline.css" type="text/css" media="screen" id="outlineStyle" />
+<link rel="stylesheet" href="ui/default/print.css" type="text/css" media="print" id="slidePrint" />
+<link rel="stylesheet" href="ui/default/opera.css" type="text/css" media="projection" id="operaFix" />
+<!-- embedded styles -->
+<!-- S5 JS -->
+<script src="ui/default/slides.js" type="text/javascript"></script>
+<style type="text/css" media="all">
+.imgcon {width: 525px; margin: 0 auto; padding: 0; text-align: center;}
+#anim {width: 270px; height: 320px; position: relative; margin-top: 0.5em;}
+#anim img {position: absolute; top: 42px; left: 24px;}
+img#me01 {top: 0; left: 0;}
+img#me02 {left: 23px;}
+img#me04 {top: 44px;}
+img#me05 {top: 43px;left: 36px;}
+blockquote {text-align: left;}
+</style>
+</head>
+<body>
+
+<div class="layout">
+<div id="controls"><!-- DO NOT EDIT --></div>
+<div id="currentSlide"><!-- DO NOT EDIT --></div>
+<div id="header"></div>
+<div id="footer">
+<h1>Beanstalk job queue</h1>
+<h2>PHP London meetup &#8226; May 6th, 2010</h2>
+</div>
+</div>
+
+<div class="presentation">
+
+<div class="slide">
+<h1>Beanstalkd:</h1>
+<h2>An Introduction</h2>
+<p>PHP London, May 6th 2010</p>
+<h3>Alister Bulman</h3>
+<p><a href="http://abulman.co.uk/">http://abulman.co.uk</a></p>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>self::about()</h1>
+<h2>self::current()</h2>
+<p>Scaling PHP-based systems, with related technologies. PHP Developer at 
+<a href="http://binweevils.com">Binweevils.com</a>. All the while trying to 
+avoid getting phone calls on weekends...</p>
+<h2>self::prev()</h2>
+<p>Programming PHP since 1999, PHP v3, (@11 years ago). Previously in 
+everything from a ZX81, BBC/Electron, 6502 to 8086 Assembler, Pascal and C/C++ 
+before PHP</p>
+
+  <div class="handout">
+    <p>Programming since 198-cough</p>
+  </div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>What Is A ?</h1>
+<ul>
+    <li>Job Queue</li>
+    <li>Work Queue</li>
+    <li>Task Queue</li>
+    <li>Message Queue</li>
+</ul>
+<p>For our purposes, they all describe much the same thing</p>
+
+  <div class="handout">
+    <p>'Message Queue' is usually more 'enterprise-y, and often has
+     additional'Business Intelligence' within it.</p>
+  </div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>What Is A Job Queue?</h1>
+<p><blockquote>(Beanstalkd) is a simple, fast workqueue service. Its interface is 
+generic, but was originally designed for reducing the latency of page views in 
+high-volume web applications by running time-consuming tasks asynchronously.
+</blockquote>
+<cite><a href="http://kr.github.com/beanstalkd/">http://kr.github.com/beanstalkd/</a></cite>
+</p>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Huh?</h1>
+<ul class="incremental">
+<p>It's a big to-do list.</p>
+<p>You send it a message, and then can retrieve it later</p>
+
+  <div class="handout">
+    <p>Sometimes, you won't be pulling jobs out in the same order you that
+    put them in - but we'll come back to that later</p>
+  </div>
+</ul>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Why are job queues useful?</h1>
+<p>Many long running, or intensive tasks could be done in the background</p>
+<p> - Background or Parallel Processing</p>
+<hr/>
+<ul class="incremental">
+<li>processing image or videos</li>
+<li>Sending out emails</li>
+<li>Fetching information in the background - like RSS feeds</li>
+<li>Preparing information for later use</li>
+</ul>
+
+  <div class="handout">
+    <p>The classic problem is image uploads. Even happy-snap digital cameras 
+    can produce an image that is 3-4+ megabytes.  You can't just store that 
+    and end up resizing it in the browser. You have to resize it, but you also 
+    can't do it in the same PHP process that uploaded it - it takes too much 
+    time - and memory.</p>
+    <p>Don't even try to resize 5+ GB of 1080p quality HD video</p>
+    <p>Use of queues at Flickr<br />
+        - the most popular use isn't even about resizing images</p>
+  </div>
+
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>The Advantages</h1>
+<ul>
+<li>Parallel and/or asyncronous work
+  <ul>
+    <li>it's too much to do while we wait</li>
+    <li>do it in the background, while we are doing other things</li>
+  </ul>
+</li>
+<li>Scales easily - run more workers
+  <ul>
+    <li>if the work can be done independently of data</li>
+    <li>workers can be run almost anywhere within your cluster</li>
+    <li>particular jobs can also be directed to specific machines</li>
+  </ul>
+</li>
+<li>Call functionality written in other languages</li>
+</ul>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>How It Works</h1>
+<img src="Msmq.jpg" width="518" height="210" alt="Msmq" align="right" />
+
+<ul class="incremental">
+<li>Queues: Acts as a message buffer between producer and consumer</li>
+<li>Daemon: When messages are released to the consumer/worker</li>
+<li>Producer: Creates messages that are put into the queue</li>
+<li>Consumer/Worker: Pulls messages from the queue, and works on them</li>
+</ul>
+
+  <div class="handout">
+    <p>We've talked about what you can do - and why you would, lets see how. 
+    How would a queue be structured</p>
+  </div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Queueing via a database</h1>
+<ul>
+<li>An obvious early step</li>
+<li>Not actually so well suited, especially with many transactions <br />
+  <small>high transaction costs - locking to ensure only one worker can get a message</small>
+</li>
+<li>PEAR's Mail_Queue <small>can work very well with small number of 'workers'</small></li>
+</ul>
+<hr/>
+
+<p><strong>Polling</strong><br />
+<small>Gizza job! Gizza job! Gizza job! Gizza job! Gizza job! Gizza job! Gizza job! 
+Gizza job! Gizza job! Gizza job! Gizza job! Gizza job! Gizza job! Gizza job! Gizza 
+job! Gizza job! Gizza job! Gizza job! Gizza job! </small></small></p>
+
+<p><strong>Blocking</strong><br />
+<small>I'll wait here till you have something</small></p>
+
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Dedicated queue systems</h1>
+<h2>There are a number of jobQueue / message queues</h2>
+<ul>
+    <li>ActiveMQ</li>
+    <li>RabbitMQ, written in Erlang (recently bought by VMWare)</li>
+    <li>Amazon SQS</li>
+    <li>Gearman, like so many  other things, originally created by Livejournal</li>
+    <li>Zero MQ</li>
+    <li>Sparrow, Starling, and now Kestrel by Twitter</li>
+</ul>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Beanstalkd</h1>
+
+<p>Many language bindings are available</p>
+<p>Quite easy to write, as it's a simple text-based format, ala Memcached</p>
+<!--
+begin tag cloud : generated by TagCrowd.com
+Feel free to modify as long as you keep this notice.
+EMBEDDING INSTRUCTIONS:
+1. Customize your cloud's style by editing the CSS where it says CUSTOMIZE below.
+2. Insert this code in its entirety into your webpage or blog post.
+This code and its rendered image are released under the Creative Commons Attribution-Noncommercial 3.0 Unported License. (http://creativecommons.org/licenses/by-nc/3.0/)
+For COMMERCIAL USE LICENSING, visit http://tagcrowd.com/licensing.html
+-->
+<style type="text/css"><!-- #htmltagcloud{
+/******************************************
+ * CUSTOMIZE CLOUD CSS BELOW (optional)
+ */
+	font-size: 36%;
+	width: 55%;		/* auto or fixed width, e.g. 500px   */
+	font-family:'lucida grande','trebuchet ms',arial,helvetica,sans-serif;
+	background-color:#fff;
+	margin:1em 1em 0 1em;
+	border:2px dotted #ddd;
+	padding:2em; 
+/******************************************
+ * END CUSTOMIZE
+ */
+}#htmltagcloud{line-height:2.4em;word-spacing:normal;letter-spacing:normal;text-transform:none;text-align:justify;text-indent:0}#htmltagcloud a:link{text-decoration:none}#htmltagcloud a:visited{text-decoration:none}#htmltagcloud a:hover{color:white;background-color:#05f}#htmltagcloud a:active{color:white;background-color:#03d}.wrd{padding:0;position:relative}.wrd a{text-decoration:none}.tagcloud0{font-size:1.0em;color:#ACC1F3;z-index:10}.tagcloud0 a{color:#ACC1F3}.tagcloud1{font-size:1.4em;color:#ACC1F3;z-index:9}.tagcloud1 a{color:#ACC1F3}.tagcloud2{font-size:1.8em;color:#86A0DC;z-index:8}.tagcloud2 a{color:#86A0DC}.tagcloud3{font-size:2.2em;color:#86A0DC;z-index:7}.tagcloud3 a{color:#86A0DC}.tagcloud4{font-size:2.6em;color:#607EC5;z-index:6}.tagcloud4 a{color:#607EC5}.tagcloud5{font-size:3.0em;color:#607EC5;z-index:5}.tagcloud5 a{color:#607EC5}.tagcloud6{font-size:3.3em;color:#4C6DB9;z-index:4}.tagcloud6 a{color:#4C6DB9}.tagcloud7{font-size:3.6em;color:#395CAE;z-index:3}.tagcloud7 a{color:#395CAE}.tagcloud8{font-size:3.9em;color:#264CA2;z-index:2}.tagcloud8 a{color:#264CA2}.tagcloud9{font-size:4.2em;color:#133B97;z-index:1}.tagcloud9 a{color:#133B97}.tagcloud10{font-size:4.5em;color:#002A8B;z-index:0}.tagcloud10 a{color:#002A8B}.freq{font-size:10pt !important;color:#bbb}#credit{text-align:center;color:#333;margin-bottom:0.6em;font:0.7em 'lucida grande',trebuchet,'trebuchet ms',verdana,arial,helvetica,sans-serif}#credit a:link{color:#777;text-decoration:none}#credit a:visited{color:#777;text-decoration:none}#credit a:hover{color:white;background-color:#05f}#credit a:active{text-decoration:underline}// -->
+</style>
+<div id="htmltagcloud"> <span id="1" class="wrd tagcloud3"><a href="#tagcloud">erlang</a></span> <span id="2" class="wrd tagcloud3"><a href="#tagcloud">io</a></span> <span id="3" class="wrd tagcloud3"><a href="#tagcloud">java</a></span> <span id="4" class="wrd tagcloud3"><a href="#tagcloud">lisp</a></span> <span id="5" class="wrd tagcloud3"><a href="#tagcloud">ocaml</a></span> <span id="6" class="wrd tagcloud6"><a href="#tagcloud">perl</a></span> <span id="7" class="wrd tagcloud6"><a href="#tagcloud">php</a></span> <span id="8" class="wrd tagcloud6"><a href="#tagcloud">python</a></span> <span id="9" class="wrd tagcloud3"><a href="#tagcloud">rails</a></span> <span id="10" class="wrd tagcloud6"><a href="#tagcloud">ruby</a></span> <span id="11" class="wrd tagcloud3"><a href="#tagcloud">scheme</a></span> </div>
+<!-- end tag cloud : generated by TagCrowd.com : please keep this notice -->
+
+<p>The daemon is equally dumb as a classic MemcacheD. Talking to multiple 
+servers is done from the client-side.</p>
+
+  <div class="handout">
+    <p>BeanstalkD was written in C for a Facebook app called 'Causes' - 
+    which was written in RubyOnRails</p>
+    <p>Not to be confused with the 'Beanstalkapp.com', which is remote 
+     SVN & GIT version control</p>
+  </div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h4>History</h4>
+
+<p><small>Philotic, Inc. developed beanstalk to improve the response time for the 
+Causes on Facebook application (with over 9.5 million users). Beanstalk 
+decreased the average response time for the most common pages to a tiny 
+fraction of the original, significantly improving the user experience.</small></p>
+
+<ul>
+    <li><a href="http://kr.github.com/beanstalkd/">http://kr.github.com/beanstalkd/</a></li>
+    <li><a href="http://github.com/kr/beanstalkd">http://github.com/kr/beanstalkd</a></li>
+    <li><a href="http://wiki.github.com/kr/beanstalkd/faq">http://wiki.github.com/kr/beanstalkd/faq</a></li>
+</ul>
+
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Beanstalkd is a series of TUBES</h1>
+<img src="the-internet-a-series-of-tubes-300x262.jpg" alt="Beanstalkd is a series of TUBES" 
+align="left" style="padding-right: 1em; padding-bottom: 1em;"  />
+<p style="margin-left: 50%;display:block;"><blockquote>
+... The Internet is not something that you just dump something on. It's not a 
+big truck. It's a series of tubes. And if you don't understand, those tubes 
+can be filled and if they are filled, when you put your message in, it gets 
+in line and it's going to be delayed by anyone that puts into that tube 
+enormous amounts of material.  - former United States Senator Ted Stevens (R-Alaska)</blockquote></p>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Killer features</h1>
+<ul>
+    <li>Tube names</li>
+    <li>Priorities</li>
+    <li>Delays</li>
+    <li>TTR - time to run</li>
+</ul>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Tubes</h1>
+<p>Named tubes/queues can be created at will and have messages sent to them</p>
+<p>'default' queue is always created and read from, unless overridden</p>
+
+<p>Now _ with _ added _ underlines!</p>
+  <div class="handout">
+    <p>Pick a given set, and stick to them. Make sure you have at least a running worker reading from every tube</p>
+    <p>watch a tube-name based on the machine's hostname - file uploads onto a specific machine</p>
+  </div>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Priorities</h1>
+<p>0 to 4,294,967,295 (2^<sup>32</sup>)</p>
+<p>Most urgent: 0</p>
+<p>I'd suggest a range from 100 to 1000 - just be consistant</p>
+<pre>
+class YourApp_Task {
+    const PRI_CHECK_EMAIL   = 500;
+    const PRI_PROCESS_IMAGE = 800;
+    const PRI_LOGIN_ACTION  = 100;
+}
+$priority = YourApp_Task::PRI_LOGIN_ACTION;
+</pre>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Delay</h1>
+<h2>Do this after <em>x</em> seconds</h2>
+<p>Hold a message within the queue before allowing it to be reserved, and acted upon</p>
+
+<p><em>I want you to do this job - but in at least x seconds time</em></p>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>TTR</h1>
+<p>How long can a job be reserved (being worked on) before it's retried?</p>
+<p>When a job has been reserved. a timer starts counting down from the job's TTR.</p>
+<ul class="incremental">
+    <li>If the timer reaches zero, the job gets put back in the ready queue for another task to run it.</li>
+    <li>If the job is buried, deleted, or released before the timer runs out, the timer ceases to exist.</li>
+    <li>If the job is 'touch'ed before the timer reaches zero, the timer starts over counting down from TTR.</li>
+</ul>
+
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>lifecycle of a job</h1>
+<small><pre>
+   put            reserve               delete
+  -----> [READY] ---------> [RESERVED] --------> *poof*
+
+  
+Here is a picture with more possibilities:
+
+   put with delay               release with delay
+  ----------------> [DELAYED] <------------.
+                        |                   |
+                        | (time passes)     |
+                        |                   |
+   put                  v     reserve       |       delete
+  -----------------> [READY] ---------> [RESERVED] --------> *poof*
+                       ^  ^                |  |
+                       |   \  release      |  |
+                       |    `-------------'   |
+                       |                      |
+                       |                      |
+                       | kick                 |
+                       |            bury      |
+                    [BURIED] <---------------'
+                       |
+                       |  delete
+                        `--------> *poof*</pre></small>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>What to send through the queue?</h1>
+<ul>
+    <li>'Clean URLs':
+        <ul><li>/tasks/image/resize/filename/example.jpg/sizeX/640/sizeY/480</li>
+            <li>/tasks/member/logintasks/id/12345</li>
+            <li>/tasks/mail/fetchcounts/id/12345</li>
+        </ul>
+    <li>PHP's serialize/deserialize</li>
+    <li>JSON
+        <ul><li>{"module":"task","controller":"image","action":"resize",
+                 &nbsp;&nbsp;"params":{"filename":"example1.jpg"}}</li>
+        </ul>
+    </li>
+    <li>plain text: RESTART, STOP, UPDATE-COUNTS</li>
+</ul>
+<p>64KB default limit.</p>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Queuing / Running</h1>
+<h2>Producer (queues jobs)</h2>
+<small><pre style="background-color: silver">&lt;?php
+require_once 'pheanstalk_init.php';
+$pheanstalk = new Pheanstalk('127.0.0.1');
+
+$pheanstalk->useTube('testtube')
+           ->put("job payload goes here\n");
+</pre></small>
+
+
+<h2>worker (performs jobs)</h2>
+<small><pre style="background-color: silver">&lt;?php
+require_once 'pheanstalk_init.php';
+$pheanstalk = new Pheanstalk('127.0.0.1');
+
+$job = $pheanstalk->watch('testtube')
+                  ->ignore('default')
+                  ->reserve();
+
+// <em>handwave</em> to run the job
+echo $job->getData();
+
+$pheanstalk->delete($job);
+</pre></small>
+</div>
+
+<!-- ======================= -->
+<!-- 
+<div class="slide">
+<h1>Running workers</h1>
+<small><small><pre><code>
+#!/bin/bash
+
+# a shell script that keeps looping until an exit code is given
+
+nice php -q -f ./cli-beanstalk-worker.php -- $@
+ERR=$?
+
+if [ $ERR -eq 97 ]      # a planned pause, then restart
+then 
+   sleep 1;
+   exec $0 $@;
+fi
+
+if [ $ERR -eq 98 ]      # a planned restart - instantly
+then 
+   exec $0 $@;
+fi
+
+if [ $ERR -eq 99 ]      # planned complete exit
+then 
+   exit 0;
+fi
+
+# unplanned exit, pause, and restart
+echo "unplanned restart: err:" $ERR;
+echo "sleeping for 1 sec"
+sleep 1
+
+exec $0 $@
+</code></pre></small></small>
+</div>
+ -->
+ 
+<!-- ======================= -->
+
+<!-- 
+<div class="slide">
+<h1>Running workers - the PHP script</h1>
+<small><small><pre><code>
+#!/usr/bin/php
+&lt;?php
+// cli-beanstalk-worker.php
+// for testing of the BASH script
+exit (rand(95, 100));
+
+/* normally we would return one of
+# 97  - planned pause/restart
+# 98  - planned restart
+# 99  - planned stop, exit.
+# anything else is an unplanned restart
+*/
+</code></pre></small></small>
+</div>
+-->
+<!-- ======================= -->
+
+
+
+<div class="slide">
+<h1>Behind the curtains</h1>
+<h2>telnet localhost 11300</h2>
+<ul>
+<li><pre><code>use &lt;tube>\r\n</pre></code></li>
+<li><pre><code>put &lt;pri> &lt;delay> &lt;ttr> &lt;bytes>\r\n<br />&lt;data>\r\n</pre></code></li>
+<li><pre><code>watch &lt;tube>\r\n</pre></code></li>
+<li><pre><code>reserve\r\n</pre></code>
+    <p>Alternatively, if you don't want to have to poll for a new job, you can specify a timeout:</p></li>
+<li><pre><code>reserve-with-timeout &lt;seconds>\r\n</pre></code></li>
+</ul>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>It's pretty quick</h1>
+<small><pre><code>
+&lt;?php
+require 'pheanstalk_init.php';
+$pheanstalk = new Pheanstalk('127.0.0.1');
+for ($i = 10000; $i > 0; $i --) {
+    $pheanstalk->put("job payload goes here\n");
+}
+</code></pre></small>
+<p>10,000 simple jobs queued:
+<pre>$ time php -f fillQueue.php
+
+real    0m3.272s
+user    0m1.764s
+sys     0m0.768s</pre></p>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>And to fetch them</h1>
+<small><pre><code>
+&lt;?php
+require 'pheanstalk_init.php';
+$pheanstalk = new Pheanstalk('127.0.0.1');
+for ($i = 10000; $i > 0; $i --)
+{
+    $job = $pheanstalk->reserve(2);  // reserve - with timeout
+    if (! $job) {
+       continue;
+    }
+    $job->getData();
+    $pheanstalk->delete($job);
+}
+</code></pre></small>
+<p>10,000 simple jobs de-queued:
+<pre>$ time php -f getQueue.php
+
+real    0m4.973s
+user    0m2.584s
+sys     0m1.304s</pre></p>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>stats</h1>
+<small><pre># <strong>telnet localhost 11300</strong>
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+<strong>stats</strong>
+OK 814
+---
+current-jobs-urgent: 7145
+current-jobs-ready: 7145
+current-jobs-reserved: 0
+.....
+current-tubes: 1
+current-connections: 1
+current-producers: 0
+current-workers: 0
+current-waiting: 0
+total-connections: 5
+pid: 5756
+....
+</pre></small>
+</div>
+
+<!-- ======================= -->
+
+
+
+
+<div class="slide">
+<h1>In Summary</h1>
+<ul>
+<li>Job queuing systems can give a lot of flexability to pass messages into background processing</li>
+<li>Background tasks are not subject to the same limits as a webpage would be - time or memory</li>
+<li>Work can be distributed across a number of machines</li>
+<li>Data can be generated and stored by the worker for later use</li>
+<li>Limited by your imagination on how to use it</li>
+</ul>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Thanks</h1>
+<ul>
+    <li>PHP London and the PHP Conference</li>
+    <li>Remo Biagioni of Stickyeyes.com (presented at PHP conference) and mentioned his work with Beanstalkd to scale</li>
+    <li><img src="Msmq.jpg" width="200" alt="Msmq" align="left" />
+        <a href="http://en.wikipedia.org/wiki/File:Msmq.jpg">http://en.wikipedia.org/wiki/File:Msmq.jpg</a> 
+        USGOV, public domain </li>
+    <li style="clear:left">Beanstalkd FAQ and github pages at <a href="http://kr.github.com/beanstalkd/">http://kr.github.com/beanstalkd/</a></li>
+</ul>
+</div>
+
+<!-- ======================= -->
+
+<div class="slide">
+<h1>Questions ?</h1>
+<ul>
+    <li>Alister Bulman</li>
+    <li><a href="http://abulman.co.uk">http://abulman.co.uk</a></li>
+    <li><a href="http://www.google.com/profiles/abulman">http://www.google.com/profiles/abulman</a></li>
+    <li>and elsewhere</li>
+</ul>
+
+<p>Beanstalkd on Github: <a href="http://kr.github.com/beanstalkd/">http://kr.github.com/beanstalkd/</a></p>
+
+</div>
+
+</div><!-- /div class="presentation" -->
+
+</body>
+</html>

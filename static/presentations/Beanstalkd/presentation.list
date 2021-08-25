@@ -1,0 +1,89 @@
+http://upload.wikimedia.org/wikipedia/commons/5/52/Data_Queue.svg
+http://en.wikipedia.org/wiki/File:Data_Queue.svg created by Wikipedia:User:Vegpuff {cc-by-sa-3.0}
+
+http://farm4.static.flickr.com/3514/3773863342_bcbc78aecf_o.jpg
+http://www.flickr.com/photos/dianaschnuth/3773863342/ http://creativecommons.org/licenses/by-nc-sa/2.0/
+http://www.flickr.com/photos/dianaschnuth/
+
+http://nubyonrails.com/system/uploads/2007/q-summary.png
+http://nubyonrails.com/articles/about-this-blog-beanstalk-messaging-queue
+
+
+Previously at a dating site, taking it from 75,000 members to 300,000
+and ending up with less server resources
+Sending 250,000 emails a week, via PEAR's Mail_Queue
+
+------------------------
+
+How Flickr is using queues
+
+------------------------
+
+queueing via a database
+    DB speed
+    PEAR Mail_Queue
+
+Polling
+    - Gizza job!
+    - Gizza job!
+    - Gizza job!
+    - Gizza job!
+    - Gizza job!
+    - Gizza job!
+Blocking
+    - I'll wait here till you have something
+
+Beanstalkd
+    inspired by Memcache
+       - simple, text based protocol
+    Simple comparered to others such as RabbitMQ
+        80% the functionality with 20% the weight and complexity
+
+The most basic use:
+    put a string onto a queue, and pull it out later from a worker
+    Simple, but may be too unstructured
+
+
+* Priorities - Give a number from 0 to 1000 when queueing a job and it will jump ahead of all jobs already enqueued with a higher number.
+* Persistence - Although beanstalkd stores its jobs in memory for speed and simplicity (ala memcached or redis-server), it can also save its state to a file so that you can cycle the beanstalkd process without losing any jobs.
+* Federation - Fault-tolerance and horizontal scalability is provided the same way as Memcache - through federation by the client. Take a look at how the Ruby client handles multiple beanstalkd servers, it’s really quite clever.
+* Buried jobs - When a job causes an error, you can bury it. This keeps it around for later introspection and debugging (or even re-running it), while keeping it separated from active jobs.
+* Timeouts - The default behavior for jobs not acknowledged by a client (by deleting it when finished) to re-queue. This prevents failed jobs (particularly from a client that loses its connection partway through the job) from getting lost, the same purpose of ack in AMQP. Delayed Job uses its locked_at and locked_by fields for this purpose, but it’s very easy for a worker which doesn’t exit cleanly to leave jobs in a jammed/stuck state. Beanstalk’s reserve, work, delete cycle, with a timeout to dereserve the job, means it’s impossible for a bad client to prevent a job from completing.
+
+
+Watch out
+ * if a job isn't deleted by the worker, it will be put back on the queue to be run. Unless it's deleted or buried, it will be put back - so if there is a problem with the worker, you may get stuck.
+ * If you are using persistance, a binary log file is not deleted till all jobs in the file are deleted. Buried jobs will keep the log file around, which might end up with out-of-disk errors.
+
+
+More Information:
+ * http://wiki.github.com/kr/beanstalkd/faq
+ * http://adam.blog.heroku.com/past/2010/4/24/beanstalk_a_simple_and_fast_queueing_backend/
+ * http://code.flickr.com/blog/2008/09/26/flickr-engineers-do-it-offline/
+
+------------------------
+------------------------
+wget http://xph.us/dist/beanstalkd/beanstalkd-1.4.2.tar.gz
+tar xzf beanstalkd-1.4.2.tar.gz
+cd beanstalkd-1.4.2
+./configure
+make
+sudo make install
+
+
+ - Once beanstalkd is installed, we can test it by firing it up:
+
+./beanstalkd -d -l 10.0.1.5 -p 11300
+# -d         Detach and run beanstalkd as a daemon.
+# -l <addr>  Listen on address ADDR (default is 0.0.0.0 / ALL)
+# -p <port>  Listen on TCP port PORT (default is 11300).
+
+------------------------
+
+ * BeanStalk.class.php - http://sourceforge.net/projects/beanstalk/
+
+ * Pheanstalk - http://github.com/pda/pheanstalk
+
+
+------------------------
+------------------------

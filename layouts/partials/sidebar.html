@@ -1,0 +1,102 @@
+<!-- To modify sidebar width check the css file lines 757 and 765 (for large screens) -->
+
+<aside class="sidebar thirds">
+  <section class="first odd">
+
+    {{ with .Site.Params.sidebarHeader }}
+      <h1>{{ . | markdownify }}</h1>
+    {{ end }}
+
+    <p>
+      {{ with .Site.Params.sidebarText }}
+        {{ . | markdownify }}
+      {{ end }}
+    </p>
+  </section>
+
+<!-- Font awesome icons - code taken from the Hyde-x theme - "Font Awesome by Dave Gandy - http://fontawesome.io"
+     Icons: https://fortawesome.github.io/Font-Awesome/icons/
+     to give icons square dark backgrounds use them like this: fa fa-key-square
+     size is fa-3x, sizes are 1-5
+ -->
+
+  <!-- Sidebar social network icons -->
+  <ul class="sidebar-nav">
+    <li class="sidebar-nav-item">
+      {{ with .Site.Params.github }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-github-square fa-3x"></i></a>{{ end }}
+      {{ with .Site.Params.bitbucket }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-bitbucket-square fa-3x"></i></a>{{ end }}
+      {{ with .Site.Params.gitlab }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-gitlab-square fa-3x"></i></a>{{ end }}
+      {{ with .Site.Params.twitter }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-twitter-square fa-3x"></i></a>{{ end }}
+      {{ if not .Site.Params.fontAwesome }}
+        {{ with .Site.Params.keybase }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-keybase-square fa-3x"></i></a>{{ end }} <!-- added keybase -->
+      {{ else }}
+        {{ with .Site.Params.keybase }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-key-square fa-3x"></i></a>{{ end }} <!-- added keybase -->
+      {{ end }}
+      {{ with .Site.Params.linkedin }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-linkedin-square fa-3x"></i></a>{{ end }}
+      {{ with .Site.Params.stackOverflow }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-stack-overflow-square fa-3x"></i></a>{{ end }}
+      {{ with .Site.Params.facebook }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-facebook-square fa-3x"></i></a>{{ end }}
+      {{ with .Site.Params.youtube }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-youtube-square fa-3x"></i></a>{{ end }}
+      {{ with .Site.Params.instagram }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-instagram-square fa-3x"></i></a>{{ end }}
+      {{ with .Site.Params.bitcoin }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-bitcoin-square fa-3x"></i></a>{{ end }}
+
+    <!-- Uncomment to add the RSS icon -->
+    {{ if .Site.Params.rss }}<a href="{{ "/index.xml" | absURL }}" type="application/rss+xml" title="RSS"><i class="fa fa-rss-square fa-3x"></i></a>{{ end }}
+    </li>
+
+  <a href="https://stackexchange.com/users/4189"><img src="https://stackexchange.com/users/flair/4189.png" width="208" height="58" alt="profile for Alister Bulman on Stack Exchange, a network of free, community-driven Q&amp;A sites" title="profile for Alister Bulman on Stack Exchange, a network of free, community-driven Q&amp;A sites"></a>
+
+  </ul>
+
+  <!-- Sidebar menu - items are read from the config file
+       first we check if it is enabled in config file and then start adding items.
+       if Site.Params.sidebarNewWindow exists and is set to true then open these links in a new window -->
+
+  {{ with .Site.Params.sidebarMenuEnabled }}
+    {{ if eq . true }}
+      <section class="odd">
+        {{ with $.Site.Params.sidebarMenuHeader }}
+          <h1>{{ . }}</h1>
+        {{ end }}
+        {{ range $.Site.Menus.sidebar }}
+          <li>
+            <a href="{{ .URL | absURL }}" title="{{ .Name }}" {{ if eq $.Site.Params.sidebarNewWindow true }} target="_blank" rel="noopener noreferrer" {{ end }}>{{ .Name }}</a>
+          </li>
+        {{ end }}
+      </section>
+    {{ end }}
+  {{ end }}
+
+  <!-- Add recent posts - limit is .Site.Params.sidebarRecentLimit - example copied from https://gohugo.io/templates/go-templates/ -->
+  <!-- Only display this section if sideBarRecentLimit is not zero -->
+  {{ with .Site.Params.sidebarRecentLimit }}
+    {{ if not (eq . 0) }}
+      <section class="even">
+        <h1>Recent Posts</h1>
+        <ul id="recent_posts">
+          {{ $pages := where $.Site.Pages "Type" "post" }}
+          {{ range first . $pages }}
+            {{ if .IsPage }}
+              <li class="post">
+                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+              </li>
+            {{ end }}
+          {{ end }}
+        </ul>
+      </section>
+    {{ end }}
+  {{ end }}
+
+  <!-- List of tags, ordered by count of use -->
+  <div class="sidebar-section">
+    <h3>Tags</h3>
+    <ul style="list-style-type:none; padding:0; margin:0;">
+        {{ range $.Site.Taxonomies.tags.ByCount }}
+          <a href="/tags/{{ .Name }}">{{ .Name }} ({{ .Count }})</a>
+        {{ end }}
+        <!-- {{ range $.Site.Taxonomies.categories.ByCount }}
+          <a href="/categories/{{ .Name }}">{{ .Name }} ({{ .Count }})</a>
+        {{ end }} -->
+    </ul>
+  </div>
+
+</aside>
