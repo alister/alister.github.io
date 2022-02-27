@@ -25,6 +25,7 @@
     <li class="sidebar-nav-item">
       {{ with .Site.Params.github }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-github-square fa-3x"></i></a>{{ end }}
       {{ with .Site.Params.bitbucket }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-bitbucket-square fa-3x"></i></a>{{ end }}
+      {{ with .Site.Params.blog }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-home fa-3x"></i></a>{{ end }}
       {{ with .Site.Params.gitlab }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-gitlab-square fa-3x"></i></a>{{ end }}
       {{ with .Site.Params.twitter }}<a target="_blank" rel="noopener noreferrer" href="{{ . }}" title="{{ . }}"><i class="fa fa-twitter-square fa-3x"></i></a>{{ end }}
       {{ if not .Site.Params.fontAwesome }}
