@@ -1,10 +1,11 @@
 ---
+slug: "php-gotcha-using-php-temp"
+url: "blog/2022/02/27/php-gotcha-using-php-temp"
 title: "PHP Gotcha: Using php://temp"
 date: "2022-02-27T14:15:00+00:00"
 layout: blog
 toc: true
 tags:
-- opensource
 - php
 - gotcha
 ---
