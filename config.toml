@@ -52,7 +52,7 @@ priority = 0.5
   # Sidebar text also supports markdown
   # New lines can be added with two spaces at the end of line. New paragraphs can be added with two an empty line.
   # when adding two new lines, remember to remove the indentation otherwise the new line will be treated as a codeblock
-  sidebarText = """Re-created with Hugo, Auguest 2021.
+  sidebarText = """Re-created with Hugo, August 2021.
   """
   # Sidebar menu - if true will add a sidebar menu between sidebar text and recent posts
   sidebarMenuEnabled = true
