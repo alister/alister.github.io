@@ -164,14 +164,15 @@ priority = 0.5
 #   URL = "/"
 #   weight = -50
 
-# [[menu.main]]
-#   Name = "Archives"
-#   URL = "/blog/"
-#   weight = -5
-
 [[menu.main]]
   Name = "Presentations"
   URL = "presentations/"
+  weight = 10
+
+[[menu.main]]
+  Name = "Projects"
+  URL = "projects/"
+  weight = 20
 
 
 # Sidebar menus
