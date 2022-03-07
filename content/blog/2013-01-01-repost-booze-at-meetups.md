@@ -5,7 +5,6 @@ layout: blog
 published: true
 tags:
 - rant
-- repost
 ---
 
 {{< figure src="/images/lg-go-away-tshirt.jpg" class="basic-alignment right" alt="Go away or I will replace you with a very small shell script." width="300" height="300" >}}

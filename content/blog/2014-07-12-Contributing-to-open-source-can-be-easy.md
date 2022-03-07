@@ -6,16 +6,6 @@ toc: true
 tags:
 - opensource
 - github
-- packagist
-- git
-- HWIOAuthBundle
-- omniauth
-- Capistrano
-- forward3d
-- docker
-- phplondon
-- phpdox
-- faker-extensions
 ---
 Although I'm busy day to day at my current contract <sup>*</sup>, that isn't to say that my passions outside the office have come to a complete stop. I'm still going to regular meetups (like the [PHP London Meetup](https://www.meetup.com/phplondon/) and [Docker London](https://www.meetup.com/Docker-London/events/192394082/)), and I'm also planning to go to [Symfony Live London 2014](https://london2014.live.symfony.com/). I've also been reading about, and trying some software, and making the odd fix and new code for myself.
 
