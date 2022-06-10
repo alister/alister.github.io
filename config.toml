@@ -22,12 +22,14 @@ blog = "/blog/:year/:month/:day/:title/"
 [markup]
   # Default is startLevel 2 and endLevel 3, we want to render every heading
   [markup.tableOfContents]
-    endLevel = 8
-    startLevel = 1
+    startLevel = 2
+    endLevel = 3
+    ordered = false
   # set the Chroma highlighting options
   # https://gohugo.io/getting-started/configuration-markup/#highlight
+  # https://xyproto.github.io/splash/docs/all.html
   [markup.highlight]
-    style = "solarized-dark"
+    style = "monokai"
 
 # https://gohugo.io/templates/sitemap-template/#configure-sitemapxml
 [sitemap]

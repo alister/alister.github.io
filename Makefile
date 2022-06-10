@@ -38,22 +38,24 @@ version:
 
 .PHONY: watch
 watch:
-	$(HUGO) server -w --verbose --cleanDestinationDir --enableGitInfo --buildDrafts --buildFuture \
+	$(HUGO) server -w --verbose --cleanDestinationDir  --enableGitInfo --buildDrafts --buildFuture \
 		--destination public/
+#
 
 .PHONY: build
 build:
-	$(HUGO) server --verbose --minify --cleanDestinationDir --enableGitInfo \
+	$(HUGO)           --verbose --cleanDestinationDir --enableGitInfo
+		--minify \
 		--destination public/
 
-# For a Github-pages workflow config, see https://github.com/marketplace/actions/proof-html
-html-test:
-	docker run --rm -it -v $(pwd):/$(DESTDIR) klakegg/html-proofer:3.19.2 \
-		--allow-hash-href --check-html --check_opengraph --check_favicon --check_img_http \
-			#--empty-alt-ignore
+##
 
-#minified: .minified
-# .minified: public html-minifier.conf
-# 	# Find all HTML and in parallel run the minifier
-# 	#find public -type f -iname '*.html' | parallel --tag $(HTML_MINIFIER) "{}" -o "{}"
-# 	#touch .minified
+new:
+	$(HUGO) new --enableGitInfo --kind blog --contentDir content \
+		"blog/$(shell date +"%Y-%m-%d")-$(shell bash -c 'read -p "Slug (e.g., 'my-new-post'): " slug; echo $$slug').md"
+
+# For a Github-pages workflow config, see https://github.com/marketplace/actions/proof-html
+.PHONY: html-test
+html-test: clean build
+	docker run --rm -it -v $(pwd):/$(DESTDIR) klakegg/html-proofer:3.19.2 \
+		--allow-hash-href --check-html --check_opengraph --check_favicon --check_img_http
