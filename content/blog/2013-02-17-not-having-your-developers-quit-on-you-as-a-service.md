@@ -9,7 +9,7 @@ tags:
 published: true
 ---
 
-{{< tweet 302046661528649728 >}}
+{{< tweet user="alister_b" id="302046661528649728" >}}
 
 <!-- <blockquote class="twitter-tweet" align="right"><p>Developers! Trying to work for a company with crappy s/w practices sucks. Don't succumb to Stockholm Syndrome. Do better</p>&mdash; Alister Bulman (@alister_b) <a href="https://twitter.com/alister_b/status/302046661528649728">February 14, 2013</a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script> -->
 Discuss at [Hacker News](https://news.ycombinator.com/item?id=5238705)
