@@ -1,7 +1,8 @@
-.PHONY: all clean minified server watch help
-
-HUGO := ~/.bin/hugo
-#HTML_MINIFIER := html-minifier -c html-minifier.conf
+HUGO := ~/.bin/hugo_extended_0.100.2
+DESTDIR=public
+HUGO_VERSION=0.58.3
+OPTIMIZE = find $(DESTDIR) -not -path "*/static/*" \( -name '*.png' -o -name '*.jpg' -o -name '*.jpeg' \) -print0 | \
+xargs -0 -P8 -n2 mogrify -strip -thumbnail '1000>'
 
 # All input files
 FILES=$(shell find content layouts static themes -type f)
@@ -22,12 +23,34 @@ help:
 	@echo "  make watch"
 	@echo "  open "
 
+
+.PHONY: all
+all: clean watch
+
+.PHONY: clean
+clean:
+	@echo "🧹 Cleaning old build"
+	cd $(DESTDIR) && rm -rf *
+
+.PHONY: version
+version:
+	$(HUGO) version
+
+.PHONY: watch
 watch:
 	$(HUGO) server -w --verbose --cleanDestinationDir --enableGitInfo --buildDrafts --buildFuture \
 		--destination public/
+
+.PHONY: build
 build:
 	$(HUGO) server --verbose --minify --cleanDestinationDir --enableGitInfo \
 		--destination public/
+
+# For a Github-pages workflow config, see https://github.com/marketplace/actions/proof-html
+html-test:
+	docker run --rm -it -v $(pwd):/$(DESTDIR) klakegg/html-proofer:3.19.2 \
+		--allow-hash-href --check-html --check_opengraph --check_favicon --check_img_http \
+			#--empty-alt-ignore
 
 #minified: .minified
 # .minified: public html-minifier.conf

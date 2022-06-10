@@ -28,10 +28,6 @@ blog = "/blog/:year/:month/:day/:title/"
   # https://gohugo.io/getting-started/configuration-markup/#highlight
   [markup.highlight]
     style = "solarized-dark"
-  # if you want to keep using Blackfriday
-  # defaultMarkdownHandler = "blackfriday"
-  #   [markup.blackFriday]
-  #     hrefTargetBlank = true # open links in a new tab
 
 # https://gohugo.io/templates/sitemap-template/#configure-sitemapxml
 [sitemap]
