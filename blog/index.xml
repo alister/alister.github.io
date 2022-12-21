@@ -18,7 +18,7 @@ blockquote.twitter-tweet a:focus {
 text-decoration: underline;
 }
 &lt;/style>
-&lt;blockquote class="twitter-tweet">&lt;p lang="en" dir="ltr">Developers! Trying to work for a company with crappy s/w practices sucks. Don&amp;#39;t succumb to Stockholm Syndrome. Do better&lt;/p>&amp;mdash; Alister (@alister_b) &lt;a href="https://twitter.com/alister_b/status/302046661528649728?ref_src=twsrc%5Etfw">February 14, 2013&lt;/a>&lt;/blockquote>
+&lt;blockquote class="twitter-tweet" data-dnt="true">&lt;p lang="en" dir="ltr">Developers! Trying to work for a company with crappy s/w practices sucks. Don&amp;#39;t succumb to Stockholm Syndrome. Do better&lt;/p>&amp;mdash; Alister (@alister_b) &lt;a href="https://twitter.com/alister_b/status/302046661528649728?ref_src=twsrc%5Etfw">February 14, 2013&lt;/a>&lt;/blockquote>
 &lt;!-- raw HTML omitted -->
 &lt;p>Discuss at
 &lt;a href="https://news.ycombinator.com/item?id=5238705" target="_blank" rel="noopener">Hacker News&lt;/a>&lt;/p>
