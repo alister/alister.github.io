@@ -57,11 +57,13 @@ priority = 0.5
   # sidebarMenuHeader = "Links"
 
   # sidebar links
+  home = "https://abulman.co.uk"
   github = "https://github.com/alister"
   twitter = "https://twitter.com/alister_b/"
   stackoverflow = "https://stackoverflow.com/users/6216/alister-bulman"
   linkedin = "https://www.linkedin.com/in/alisterbulman"
   blog = "https://phpscaling.com/"
+  mastodon = "https://mastodon.cloud/@Alister"
   # bitbucket = "https://bitbucket.org/alisterb/"
   # youtube = ""
   #keybase = ""
