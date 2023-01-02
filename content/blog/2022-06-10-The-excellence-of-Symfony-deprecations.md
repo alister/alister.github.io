@@ -1,6 +1,6 @@
 ---
 title: "The excellence of Symfony deprecations"
-date: 2023-12-21T22:09:14+01:00
+date: 2022-12-21T22:09:14+01:00
 draft: false
 tags:
 - php
