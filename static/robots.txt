@@ -1,4 +1,4 @@
-Sitemap: https://alister.github.iositemap.xml
+Sitemap: https://alister.github.io/sitemap.xml
 
 User-agent: *
 Disallow: /wp-admin/
