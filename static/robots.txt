@@ -1,0 +1,10 @@
+Sitemap: https://alister.github.iositemap.xml
+
+User-agent: *
+Disallow: /wp-admin/
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
