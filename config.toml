@@ -64,6 +64,8 @@ priority = 0.5
   linkedin = "https://www.linkedin.com/in/alisterbulman"
   blog = "https://www.phpscaling.com/"
   mastodon = "https://hachyderm.io/@alister"
+  fediverse_creator = "@Alister@hachyderm.io"
+
   # bitbucket = "https://bitbucket.org/alisterb/"
   # youtube = ""
   #keybase = ""

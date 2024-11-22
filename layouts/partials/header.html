@@ -54,6 +54,9 @@
   <!-- Google Analytics -->
   {{ template "_internal/google_analytics_async.html" . }}
 
+{{ with .Site.Params.fediverse_creator }}
+  <meta name="fediverse:creator" content="{{ . }}" />
+{{ end }}
   <!-- Enable Twitter card -->
   {{ with .Site.Params.twitterCardEnabled }}
     {{ partial "custom_twitter_card.html" $ }}
