@@ -6,7 +6,7 @@ layout: blog
 tags:
   - interview
   - employment
-draft: true
+draft: false
 ---
 
 A couple of days ago, I had a second interview for a job - after an initial conversation with a tech-lead of the company. I wanted to write a post about it, and praise it as a really good example.
