@@ -28,3 +28,8 @@ We rounded out the discussion with ideas for how I would suggest handling some n
 Another point to leave me with a positive thought of the day came half-way through the 2+hour conversation was a 5 minute comfort break. It can be these little things that make the difference to someone being interviewed, making the difference between an extensive chore, to a fun experience. Interesting, and interested people to talk to, also help a lot!
 
 All in all, a very positive experience, and I'd very much suggest such a structure for others to use when hiring - at least with developers with a measure of existing knowledge of at least the language and framework and to see what they would be working with. Getting a better indication of someone's mindset and skills in a more real-world scenario - and showing them something of what you are like (code-wise) - is incredibly valuable.
+
+{{% commentsLink %}}
+  You can comment on this article on my Mastodon post for ["A Good Tech-Test Interview"](https://hachyderm.io/@alister/116511415223911924)
+  <hr/>
+{{% /commentsLink %}}
