@@ -65,6 +65,7 @@ priority = 0.5
   blog = "https://www.phpscaling.com/"
   mastodon = "https://hachyderm.io/@alister"
   fediverse_creator = "@Alister@hachyderm.io"
+  fediverse_creator_url = "https://hachyderm.io/@Alister"
 
   # bitbucket = "https://bitbucket.org/alisterb/"
   # youtube = ""
