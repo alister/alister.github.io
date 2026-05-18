@@ -47,12 +47,7 @@ So, just about a week before Christmas, we finally managed to get the website pu
 
 With that finally done, so was I with the project. I could have continued in the new year - on more of a maintenance basis, but I was burned out - not from overwork and time-crunches, but from trying to get things done.
 
-
-<!-- 
-
 {{% commentsLink %}}
-  You can comment on this article on my Mastodon post for ["A year at the Passport Office"](https://hachyderm.io/@alister/116511415223911924)
+  You can comment on this article on my Mastodon post for ["A year at the Passport Office"](https://hachyderm.io/@alister/116597572897791885)
   <hr/>
 {{% /commentsLink %}}
-
--->
